@@ -136,7 +136,7 @@ Referência: `mockups/sorteio-tv.html`. A tela é pensada para 16:9 em tela chei
 - "N músicas na fila · M cantores".
 - Botão **🎲 SORTEAR**. Com a fila vazia, fica desabilitado com aviso.
 
-### 8.2 Sequência do sorteio (~12 s no total, aprovada como está no esboço)
+### 8.2 Sequência do sorteio (~20 s em solo, ~25 s em dupla, aprovada como está no esboço)
 
 1. **Música:** títulos girando como roleta, desacelerando até parar na sorteada, que mostra "sugerida por [personagem] Nome" (e "💌 indicada para X", se houver).
 2. **Solo ou dupla:** moeda girando que cai em 🎤 SOLO ou 🎤🎤 DUPLA.
@@ -320,7 +320,7 @@ Seguir os esboços: fundo em degradê roxo/magenta, cartões brancos arredondado
 
 - Framework web, biblioteca de tempo real, estrutura de pastas e esquema do banco.
 - Formato e local do arquivo do dicionário.
-- Durações exatas das animações (manter o ritmo do esboço, ~12 s).
+- Durações exatas das animações (manter o ritmo do esboço: ~20 s em solo, ~25 s em dupla).
 - Implementação do personagem (SVG por peças, como no esboço, é o caminho natural) e acabamento do traço.
 - Mecanismo de proteção dos controles da TV.
 - Comportamento com link de música repetida na fila (avisar ou permitir).

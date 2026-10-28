@@ -1,4 +1,5 @@
 import { renderLobby, renderForbidden } from './lobby.js';
+import { playDraw } from './sequence.js';
 
 const stage = document.getElementById('stage');
 const key = new URLSearchParams(location.search).get('key');
@@ -24,10 +25,14 @@ function showRound(round) {
 }
 
 async function startDraw() {
-  // Animação completa entra na Tarefa 13.
+  if (app.busy) return;
+  app.busy = true;
+  app.screen = 'animating';
   const r = await emit('tv:draw');
-  if (!r.ok) return goLobby();
-  showRound(r.round);
+  if (r.ok) await playDraw(stage, r);
+  app.busy = false;
+  if (r.ok) showRound(r.round);
+  else goLobby();
 }
 
 socket.on('tv:state', state => {
