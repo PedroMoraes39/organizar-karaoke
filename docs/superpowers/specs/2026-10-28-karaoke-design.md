@@ -1,7 +1,7 @@
 # Karaokê da Festa: design
 
 **Data:** 2026-10-28
-**Status:** aguardando aprovação
+**Status:** aprovado (2026-10-28)
 
 Esboços aprovados durante a conversa estão em [`mockups/`](mockups/):
 
@@ -203,9 +203,9 @@ Fica num **arquivo de texto editável** (sem mexer no código). Formato e locali
   - dentro de `( )`, `[ ]` e `【 】`;
   - depois de um `|`;
   - num trecho separado por ` - ` que contenha **só** termos do dicionário;
-  - no começo ou no fim do título.
-- **Nunca** remover uma palavra do meio do nome da música. Uma música chamada "Letra" ou "Instrumental" continua com esse nome.
-- Uma sequência de termos do dicionário **no meio** do título, sem traço nem parênteses, funciona como **separador** ("Uma Brasileira Karaoke Playback Paralamas do Sucesso e Djavan" vira "Uma Brasileira" + "Paralamas do Sucesso e Djavan").
+  - no começo ou no fim do título, só para nomes de canais e termos "fortes" (os que contêm karaokê/karaoke, videokê ou playback).
+- **Nunca** remover uma palavra do meio do nome da música: "Minha Letra Favorita" continua com esse nome. Exceção conhecida: uma música cujo nome é exatamente um termo do dicionário e fica sozinha num trecho ("Fulano - Letra") perde esse trecho. Quem mandou corrige no celular.
+- Uma sequência de termos do dicionário **no meio** do título, sem traço nem parênteses, funciona como **separador** quando tem pelo menos um termo forte ("Uma Brasileira Karaoke Playback Paralamas do Sucesso e Djavan" vira "Uma Brasileira" + "Paralamas do Sucesso e Djavan").
 - Ao final, limpar parênteses vazios, símbolos e espaços duplicados.
 
 ### 9.4 Separar música e artista
