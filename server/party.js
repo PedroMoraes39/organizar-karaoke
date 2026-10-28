@@ -3,10 +3,12 @@ import { nameKey, validateName } from './names.js';
 import { isValidAvatar } from '../public/shared/avatar.js';
 import { parseVideoId } from './youtube.js';
 import { parseTitle } from './title-parser.js';
+import { pickSong, chooseCount, pickSingers, revealType } from './draw.js';
 
 const TITLE_MAX = 120;
 const NOTE_MAX = 60;
 const INDICATED_MAX = 2;
+const REEL_SONGS = 12;
 
 const toPublic = g => ({ id: g.id, name: g.name, avatar: g.avatar });
 
@@ -47,6 +49,52 @@ export function createParty({ store, dict, fetchVideoInfo, weights, rng = Math.r
     const g = store.getGuest(id);
     return Boolean(g) && g.leftAt === null;
   };
+
+  // Indicação de quem saiu da festa é ignorada (spec §10.3).
+  function songForDraw(song, present) {
+    const presentIds = new Set(present.map(g => g.id));
+    return { id: song.id, suggestedBy: song.suggestedBy, indicated: song.indicated.filter(id => presentIds.has(id)) };
+  }
+
+  function roundView(round) {
+    const song = store.getSong(round.songId);
+    const { indicated } = songForDraw(song, store.listPresentGuests());
+    return {
+      id: round.id,
+      count: round.count,
+      forcedDuo: round.count === 2 && indicated.length === 2,
+      type: round.type,
+      song: {
+        id: song.id,
+        videoId: song.videoId,
+        title: song.title,
+        artist: song.artist,
+        thumbnail: song.thumbnail,
+        note: song.note,
+        suggestedBy: toPublic(store.getGuest(song.suggestedBy)),
+        indicated: indicated.map(id => toPublic(store.getGuest(id))),
+      },
+      singers: round.singerIds.map(id => toPublic(store.getGuest(id))),
+    };
+  }
+
+  function shuffled(items) {
+    const out = [...items];
+    for (let i = out.length - 1; i > 0; i--) {
+      const j = Math.floor(rng() * (i + 1));
+      [out[i], out[j]] = [out[j], out[i]];
+    }
+    return out;
+  }
+
+  function closeActive(status) {
+    const round = store.getActiveRound();
+    if (!round) return { ok: false, error: 'no_round' };
+    const song = store.getSong(round.songId);
+    if (status === 'failed') store.setSongStatus(song.id, 'failed');
+    store.closeRound(round.id, status, now());
+    return { ok: true, suggestedBy: song.suggestedBy };
+  }
 
   return {
     join({ name, avatar }) {
@@ -134,5 +182,72 @@ export function createParty({ store, dict, fetchVideoInfo, weights, rng = Math.r
     },
 
     mySongs: guestId => store.listSongsBySuggester(guestId).map(toMySong),
+
+    draw() {
+      const present = store.listPresentGuests();
+      if (!present.length) return { ok: false, error: 'no_guests' };
+      if (store.getActiveRound()) return { ok: false, error: 'round_active' };
+      const queued = store.listQueuedSongs();
+      if (!queued.length) return { ok: false, error: 'empty_queue' };
+
+      const chosen = pickSong(queued, rng);
+      const song = songForDraw(chosen, present);
+      const { count } = chooseCount({ indicatedCount: song.indicated.length, poolSize: present.length, rng });
+      const singerIds = pickSingers({
+        guests: present, song, count, lastRoundIds: store.lastDoneRoundSingerIds(), excludeIds: [], weights, rng,
+      });
+      store.setSongStatus(chosen.id, 'drawn');
+      const round = store.createRound({
+        songId: chosen.id, count: singerIds.length, type: revealType(song, singerIds), singerIds, now: now(),
+      });
+      const others = shuffled(queued.filter(s => s.id !== chosen.id)).slice(0, REEL_SONGS);
+      return {
+        ok: true,
+        round: roundView(round),
+        reel: { songs: others.map(s => ({ title: s.title, artist: s.artist })), guests: present.map(toPublic) },
+      };
+    },
+
+    replaceSinger(slot) {
+      const round = store.getActiveRound();
+      if (!round) return { ok: false, error: 'no_round' };
+      if (!Number.isInteger(slot) || slot < 0 || slot >= round.singerIds.length) return { ok: false, error: 'invalid_slot' };
+      const present = store.listPresentGuests();
+      const song = songForDraw(store.getSong(round.songId), present);
+      const current = round.singerIds[slot];
+      const [next] = pickSingers({
+        guests: present,
+        song,
+        count: 1,
+        lastRoundIds: store.lastDoneRoundSingerIds(),
+        excludeIds: [...round.excludedIds, ...round.singerIds],
+        weights,
+        rng,
+      });
+      if (next === undefined) return { ok: false, error: 'no_alternative' };
+      const singerIds = round.singerIds.map((id, i) => (i === slot ? next : id));
+      store.addRoundExcluded(round.id, current);
+      store.setRoundSinger(round.id, slot, next);
+      store.setRoundType(round.id, revealType(song, singerIds));
+      return { ok: true, round: roundView(store.getActiveRound()), reel: { guests: present.map(toPublic) } };
+    },
+
+    finishRound: () => closeActive('done'),
+    failRound: () => closeActive('failed'),
+
+    newParty() {
+      store.reset();
+      return { ok: true };
+    },
+
+    tvState() {
+      const round = store.getActiveRound();
+      return {
+        phase: round ? 'round' : 'lobby',
+        guests: store.listPresentGuests().map(toPublic),
+        queueCount: store.listQueuedSongs().length,
+        round: round ? roundView(round) : null,
+      };
+    },
   };
 }
