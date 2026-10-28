@@ -1,0 +1,288 @@
+<style>
+  .tv{max-width:1000px;margin:1rem auto 0;background:#0b0b0b;border-radius:16px;padding:12px 12px 22px;box-shadow:0 14px 40px rgba(0,0,0,.45);position:relative}
+  .tv::after{content:'';position:absolute;left:50%;bottom:7px;width:46px;height:5px;margin-left:-23px;border-radius:9px;background:#222}
+  .stage{position:relative;aspect-ratio:16/9;border-radius:6px;overflow:hidden;background:radial-gradient(ellipse at 50% 30%,#40116a,#12052a 72%);color:#fff;font-family:system-ui,sans-serif;container-type:inline-size;user-select:none}
+  .scene{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.8cqw;text-align:center}
+  .kicker{font-size:2cqw;letter-spacing:.3em;text-transform:uppercase;color:#ffd23f;font-weight:900}
+  .reel{width:62cqw;padding:2.2cqw;border-radius:2cqw;background:rgba(255,255,255,.07);border:.3cqw solid rgba(255,255,255,.2)}
+  .st{font-size:4.6cqw;font-weight:900;line-height:1.1}
+  .sa{font-size:2.1cqw;color:#d9c8f0}
+  .by{display:flex;align-items:center;gap:1cqw;justify-content:center;font-size:2cqw;margin-top:1.2cqw;color:#e9dcff;animation:fadeUp .5s both}
+  .by svg{width:6cqw;height:6cqw}
+  .land{animation:pop .5s}
+  .coinwrap{perspective:900px}
+  .coin{width:22cqw;height:22cqw;position:relative;transform-style:preserve-3d;animation:coin 1.6s cubic-bezier(.15,.7,.3,1) forwards}
+  .coin .f{position:absolute;inset:0;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:900;font-size:3.2cqw;backface-visibility:hidden;background:radial-gradient(circle at 35% 30%,#fff6c9,#ffd23f 50%,#c99a00);color:#5a3a00;border:.7cqw solid #fff3b0;box-shadow:0 0 4cqw rgba(255,210,63,.35)}
+  .coin .f span{font-size:5.5cqw;line-height:1}
+  .coin .f.b{transform:rotateY(180deg);background:radial-gradient(circle at 35% 30%,#ffd6f0,#f15bb5 50%,#9d1c6a);color:#fff;border-color:#ffd6f0}
+  .slots{display:flex;gap:4cqw}
+  .slot{width:21cqw;height:25cqw;border-radius:2cqw;background:rgba(255,255,255,.07);border:.3cqw solid rgba(255,255,255,.22);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.6cqw;transition:all .25s}
+  .slot svg{width:16cqw;height:16cqw}
+  .slot b{font-size:2.4cqw}
+  .slot.land{border-color:#ffd23f;box-shadow:0 0 3.5cqw rgba(255,210,63,.55);transform:scale(1.05)}
+  .rv-title{font-size:6.2cqw;font-weight:900;line-height:1;text-shadow:0 .5cqw 0 rgba(0,0,0,.35);animation:zoomIn .6s cubic-bezier(.2,1.6,.4,1) both;position:relative;z-index:3}
+  .rv-sub{font-size:2.4cqw;color:#f4ecff;animation:fadeUp .6s .6s both;position:relative;z-index:3}
+  .rv-sub b{color:#ffd23f}
+  .rv-avs{display:flex;gap:4cqw;position:relative;z-index:3}
+  .rv-av{display:flex;flex-direction:column;align-items:center;gap:.4cqw;animation:zoomIn .6s .3s cubic-bezier(.2,1.6,.4,1) both;position:relative}
+  .rv-av:nth-child(2){animation-delay:.5s}
+  .rv-av svg{width:19cqw;height:19cqw;animation:kxBounce 1.2s ease-in-out infinite}
+  .rv-av b{font-size:2.6cqw;background:rgba(255,255,255,.15);padding:.3cqw 1.8cqw;border-radius:99px}
+  .fx{position:absolute;inset:0;pointer-events:none;z-index:1}
+  .confetti i{position:absolute;top:-3cqw;width:1cqw;height:1.7cqw;border-radius:.2cqw;animation:fall linear forwards}
+  .hearts span{position:absolute;bottom:-5cqw;font-size:3cqw;animation:rise linear forwards}
+  .env{position:relative;width:28cqw;height:17cqw;animation:zoomIn .6s cubic-bezier(.2,1.6,.4,1) both;perspective:600px}
+  .env .bd{position:absolute;inset:0;background:#ffe5ec;border-radius:1.2cqw;border:.4cqw solid #fff;box-shadow:0 1.5cqw 3cqw rgba(0,0,0,.35)}
+  .env .flap{position:absolute;left:0;right:0;top:0;height:10cqw;background:#ffb3c6;clip-path:polygon(0 0,100% 0,50% 100%);transform-origin:top;animation:flapOpen .5s .8s forwards;z-index:2}
+  .env .seal{position:absolute;left:50%;top:9cqw;transform:translate(-50%,-50%);font-size:4cqw;z-index:3;animation:fadeOut .2s .75s forwards}
+  .env .letter{position:absolute;left:8%;right:8%;top:10%;background:#fff;color:#9d1c6a;border-radius:1cqw;padding:1.4cqw 1cqw;font-weight:900;font-size:2.2cqw;line-height:1.35;animation:letterUp .8s 1.2s both;z-index:4}
+  .env .letter small{display:block;font-size:1.5cqw;color:#c06090;font-weight:700}
+  .spot{position:absolute;top:-6%;width:34cqw;height:115%;background:linear-gradient(to bottom,rgba(255,244,200,.6),rgba(255,244,200,0) 92%);clip-path:polygon(46% 0,54% 0,100% 100%,0 100%);transform-origin:50% 0;mix-blend-mode:screen}
+  .spot.l{left:2cqw;animation:sweepL 1.8s ease-in-out both}
+  .spot.r{right:2cqw;animation:sweepR 1.8s ease-in-out both}
+  .twinkle span{position:absolute;font-size:2.4cqw;animation:twinkle 1.4s ease-in-out infinite}
+  .crown{position:absolute;top:-5.5cqw;left:50%;margin-left:-3.5cqw;font-size:7cqw;animation:drop .7s 1.4s cubic-bezier(.3,1.6,.5,1) both;z-index:4}
+  .drum{font-size:3cqw;font-weight:900;color:#ffd23f;animation:shake .12s linear infinite}
+  /* player */
+  .player{position:absolute;inset:0;display:grid;grid-template-rows:auto 1fr auto;padding:1.6cqw;gap:1.2cqw;animation:fadeIn .5s both;background:linear-gradient(180deg,#1b0838,#0d0420)}
+  .pl-top{display:flex;justify-content:space-between;align-items:center;gap:2cqw}
+  .pl-song{text-align:left}
+  .pl-song .t{font-size:3.4cqw;font-weight:900;line-height:1.05}
+  .pl-song .a{font-size:1.8cqw;color:#d9c8f0}
+  .badge{font-size:1.8cqw;font-weight:900;padding:.7cqw 1.8cqw;border-radius:99px;white-space:nowrap}
+  .badge.random{background:#4cc9f0;color:#06263a}
+  .badge.dedic{background:#ff70a6;color:#4a0020}
+  .badge.own{background:#ffd23f;color:#3a1a00}
+  .pl-video{background:#000;border-radius:1.2cqw;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;border:.25cqw solid rgba(255,255,255,.12)}
+  .pl-video .ph{position:absolute;inset:0;background:repeating-linear-gradient(135deg,#111 0 2cqw,#161616 2cqw 4cqw)}
+  .pl-video .hint{position:absolute;bottom:1.2cqw;font-size:1.5cqw;color:#888}
+  .play{position:relative;width:12cqw;height:12cqw;border-radius:50%;border:none;background:#ff0033;color:#fff;font-size:5cqw;cursor:pointer;box-shadow:0 0 0 1.2cqw rgba(255,0,51,.25);animation:pulse 1.4s infinite;padding-left:1cqw}
+  .eq{display:flex;gap:1cqw;align-items:flex-end;height:12cqw;position:relative}
+  .eq i{width:2.2cqw;background:linear-gradient(#ffd23f,#f15bb5);border-radius:.5cqw;animation:eq .8s ease-in-out infinite alternate}
+  .pl-bottom{display:flex;gap:1.5cqw;align-items:center}
+  .who{display:flex;align-items:center;gap:1cqw;background:rgba(255,255,255,.08);border-radius:1.4cqw;padding:.5cqw 1.6cqw .5cqw .5cqw;text-align:left}
+  .who svg{width:6.5cqw;height:6.5cqw}
+  .who small{display:block;font-size:1.2cqw;color:#cdb8ec;text-transform:uppercase;letter-spacing:.12em}
+  .who b{font-size:2.2cqw}
+  .who.sing{border:.25cqw solid #ffd23f;background:rgba(255,210,63,.12)}
+  .pl-q{margin-left:auto;font-size:1.5cqw;color:#cdb8ec;text-align:right;display:flex;flex-direction:column;gap:.6cqw;align-items:flex-end}
+  .nextbtn{border:none;border-radius:1cqw;padding:.8cqw 1.6cqw;font-weight:900;font-size:1.7cqw;background:#ffd23f;color:#3a1a00;cursor:pointer;box-shadow:0 .4cqw 0 #c99a00}
+  /* lobby */
+  .lob-row{display:flex;gap:1.2cqw;flex-wrap:wrap;justify-content:center;max-width:80cqw}
+  .lob-row div{display:flex;flex-direction:column;align-items:center;font-size:1.6cqw;font-weight:700}
+  .lob-row svg{width:9cqw;height:9cqw;animation:kxBounce 1.4s ease-in-out infinite}
+  .lob-row div:nth-child(even) svg{animation-delay:.7s}
+  .bigbtn{border:none;border-radius:2cqw;padding:1.4cqw 5cqw;font-weight:900;font-size:3.4cqw;background:#ffd23f;color:#3a1a00;cursor:pointer;box-shadow:0 .8cqw 0 #c99a00;animation:pulse2 1.6s infinite}
+  /* controls */
+  .ctrl{max-width:1000px;margin:1rem auto 0;display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;justify-content:center}
+  .ctrl .lbl{font-weight:700;color:var(--text-secondary);font-size:.9rem}
+  .ctrl button{border:2px solid var(--border);background:var(--bg-secondary);color:var(--text-primary);border-radius:10px;padding:.55rem 1rem;font-weight:700;cursor:pointer;font-size:.95rem}
+  .ctrl button:hover{border-color:var(--accent)}
+  .ctrl button.on{border-color:var(--accent);background:var(--selected-bg)}
+  .ctrl .sep{width:1px;height:28px;background:var(--border);margin:0 .4rem}
+  .legend{max-width:1000px;margin:1.2rem auto 0;display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem}
+  @media(max-width:760px){.legend{grid-template-columns:1fr}}
+  .legend div{background:var(--bg-secondary);border:1px solid var(--border);border-radius:12px;padding:.8rem 1rem;font-size:.88rem;color:var(--text-secondary)}
+  .legend b{display:block;color:var(--text-primary);font-size:.95rem;margin-bottom:.2rem}
+  @keyframes kxBounce{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-5%) rotate(3deg)}}
+  @keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.12)}100%{transform:scale(1)}}
+  @keyframes coin{from{transform:rotateY(0)}to{transform:rotateY(var(--end))}}
+  @keyframes zoomIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+  @keyframes fadeUp{from{transform:translateY(2cqw);opacity:0}to{transform:none;opacity:1}}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  @keyframes fadeOut{to{opacity:0}}
+  @keyframes fall{to{transform:translateY(62cqw) rotate(900deg)}}
+  @keyframes rise{0%{transform:translateY(0) scale(.6);opacity:0}15%{opacity:1}100%{transform:translateY(-62cqw) scale(1.3);opacity:0}}
+  @keyframes flapOpen{to{transform:rotateX(180deg)}}
+  @keyframes letterUp{from{transform:translateY(20%);opacity:0}to{transform:translateY(-75%);opacity:1}}
+  @keyframes sweepL{0%{transform:rotate(25deg)}55%{transform:rotate(-55deg)}100%{transform:rotate(-26deg)}}
+  @keyframes sweepR{0%{transform:rotate(-25deg)}55%{transform:rotate(55deg)}100%{transform:rotate(26deg)}}
+  @keyframes twinkle{0%,100%{transform:scale(.4);opacity:.2}50%{transform:scale(1.2);opacity:1}}
+  @keyframes drop{from{transform:translateY(-45cqw) rotate(-30deg)}to{transform:translateY(0) rotate(-12deg)}}
+  @keyframes shake{0%{transform:translate(0,0)}25%{transform:translate(.2cqw,-.2cqw)}50%{transform:translate(-.2cqw,.2cqw)}75%{transform:translate(.2cqw,.2cqw)}}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 1cqw rgba(255,0,51,.25)}50%{box-shadow:0 0 0 2.2cqw rgba(255,0,51,.08)}}
+  @keyframes pulse2{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+  @keyframes eq{from{height:15%}to{height:100%}}
+</style>
+
+<h2>O sorteio na TV, com as três animações</h2>
+<p class="subtitle">Escolha um tipo de sorteio embaixo da TV para ver a sequência completa: música → solo ou dupla → quem canta → revelação → player. No final, clique no ▶ vermelho.</p>
+
+<div class="tv"><div class="stage" id="stage"></div></div>
+
+<div class="ctrl">
+  <span class="lbl">Ver sorteio:</span>
+  <button data-case="random">🎲 Surpresa</button>
+  <button data-case="dedic">💌 Indicada</button>
+  <button data-case="own">⭐ Escolha própria</button>
+  <span class="sep"></span>
+  <button data-n="1" class="on">Solo</button>
+  <button data-n="2">Dupla</button>
+</div>
+
+<div class="legend">
+  <div><b>🎲 Surpresa</b>Quem canta não enviou a música e ninguém indicou. Confete e cara de "ninguém escapa".</div>
+  <div><b>💌 Indicada</b>Alguém indicou a música para quem foi sorteado. Um envelope abre com a dedicatória e sobem corações.</div>
+  <div><b>⭐ Escolha própria</b>Quem enviou a música foi sorteado para cantar. Holofotes, coroa e "o palco é seu".</div>
+</div>
+
+<script>
+(function(){
+  // ===== personagens (mesmas peças do esboço anterior)
+  const S=(d,w=4)=>`<path d="${d}" stroke="#222" stroke-width="${w}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+  const dot=(x,y,r=6)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="#222"/><circle cx="${x+r/3}" cy="${y-r/3}" r="${r/3}" fill="#fff"/>`;
+  const star=(cx,cy,R,r,fill,st='stroke="#222" stroke-width="1.5"')=>{let p=[];for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,q=i%2?r:R;p.push((cx+q*Math.cos(a)).toFixed(1)+','+(cy+q*Math.sin(a)).toFixed(1));}return `<polygon points="${p.join(' ')}" fill="${fill}" ${st} stroke-linejoin="round"/>`;};
+  const heart=(cx,cy,s,fill)=>`<path d="M${cx} ${cy+s} C${cx-s*1.6} ${cy} ${cx-s} ${cy-s*1.2} ${cx} ${cy-s*.4} C${cx+s} ${cy-s*1.2} ${cx+s*1.6} ${cy} ${cx} ${cy+s} Z" fill="${fill}"/>`;
+  const SMILE=S('M48 76 Q60 88 72 76');
+  const BS='stroke="#fff" stroke-width="3" stroke-linejoin="round"';
+  const BLOB='M60 24 C92 24 100 50 100 72 C100 98 84 108 60 108 C36 108 20 98 20 72 C20 50 28 24 60 24 Z';
+  const COLORS=['#ff5d8f','#ffb703','#3ddc97','#4cc9f0','#9b5de5','#f15bb5','#00bbf9','#fb8500','#80ed99','#e63946','#a0c4ff','#8d6e63'];
+  const SHAPES=[
+    F=>({body:`<path d="${BLOB}" fill="${F}" ${BS}/>`}),
+    F=>({body:`<rect x="22" y="28" width="76" height="80" rx="18" fill="${F}" ${BS}/>`}),
+    F=>({body:`<path d="M24 64 C24 38 40 24 60 24 C80 24 96 38 96 64 L96 106 L86 97 L76 106 L66 97 L56 106 L46 97 L36 106 L24 97 Z" fill="${F}" ${BS}/>`}),
+    F=>({back:`<path d="M26 50 L28 12 L54 32 Z" fill="${F}" ${BS}/><path d="M94 50 L92 12 L66 32 Z" fill="${F}" ${BS}/><path d="M32 40 L33 22 L46 32 Z" fill="#ffafcc"/><path d="M88 40 L87 22 L74 32 Z" fill="#ffafcc"/>`,body:`<path d="${BLOB}" fill="${F}" ${BS}/>`}),
+    F=>({back:`<circle cx="32" cy="32" r="13" fill="${F}" ${BS}/><circle cx="88" cy="32" r="13" fill="${F}" ${BS}/><circle cx="32" cy="32" r="6" fill="#ffafcc"/><circle cx="88" cy="32" r="6" fill="#ffafcc"/>`,body:`<path d="${BLOB}" fill="${F}" ${BS}/>`}),
+    F=>({body:star(60,68,54,30,F,BS)}),
+    F=>({back:`<path d="M48 30 L38 6" stroke="#222" stroke-width="3"/><path d="M72 30 L82 6" stroke="#222" stroke-width="3"/><circle cx="38" cy="6" r="6" fill="${F}" ${BS}/><circle cx="82" cy="6" r="6" fill="${F}" ${BS}/>`,body:`<path d="M60 22 C98 22 104 46 100 70 C96 96 82 108 60 108 C38 108 24 96 20 70 C16 46 22 22 60 22 Z" fill="${F}" ${BS}/>`}),
+    F=>({body:`<path d="M60 10 C60 10 100 54 100 78 C100 98 84 108 60 108 C36 108 20 98 20 78 C20 54 60 10 60 10 Z" fill="${F}" ${BS}/>`})
+  ];
+  const FACES=[
+    dot(47,58)+dot(73,58)+SMILE,
+    S('M40 60 Q47 50 54 60')+S('M66 60 Q73 50 80 60')+'<ellipse cx="60" cy="80" rx="9" ry="11" fill="#5a0b1f"/><ellipse cx="60" cy="85" rx="5" ry="4" fill="#ff7a9a"/>',
+    '<rect x="35" y="51" width="23" height="13" rx="5" fill="#111"/><rect x="62" y="51" width="23" height="13" rx="5" fill="#111"/><rect x="56" y="54" width="8" height="3" fill="#111"/>'+S('M50 78 Q60 84 72 74'),
+    '<circle cx="47" cy="58" r="8" fill="#fff"/><circle cx="73" cy="58" r="8" fill="#fff"/><circle cx="49" cy="60" r="4" fill="#222"/><circle cx="71" cy="56" r="4" fill="#222"/><circle cx="60" cy="81" r="6" fill="#222"/>',
+    dot(47,58)+S('M66 58 Q73 52 80 58')+SMILE,
+    heart(47,58,8,'#e63946')+heart(73,58,8,'#e63946')+SMILE,
+    S('M41 52 L51 58 L41 64')+S('M79 52 L69 58 L79 64')+'<path d="M46 74 L74 74 Q74 92 60 92 Q46 92 46 74 Z" fill="#5a0b1f"/>',
+    dot(47,58)+dot(73,58)+'<path d="M55 79 Q55 92 61 92 Q67 92 67 79 Z" fill="#ff7a9a" stroke="#222" stroke-width="2"/>'+S('M48 76 Q60 84 72 76'),
+    star(47,58,10,4.5,'#ffd23f')+star(73,58,10,4.5,'#ffd23f')+'<path d="M46 74 Q60 94 74 74 Z" fill="#5a0b1f"/>',
+    dot(47,56)+dot(73,56)+'<path d="M60 72 Q50 64 40 72 Q46 80 60 75 Q74 80 80 72 Q70 64 60 72 Z" fill="#3a2a1a"/>'+S('M54 84 Q60 87 66 84',3),
+    dot(47,58,5)+dot(73,58,5)+'<ellipse cx="38" cy="70" rx="7" ry="4" fill="#ff8fab" opacity=".85"/><ellipse cx="82" cy="70" rx="7" ry="4" fill="#ff8fab" opacity=".85"/>'+S('M54 78 Q60 82 66 78',3)
+  ];
+  const ACCS=[
+    {f:''},
+    {f:'<path d="M46 30 L60 0 L74 30 Z" fill="#4cc9f0" stroke="#fff" stroke-width="2"/><path d="M52 18 L68 18" stroke="#ffd23f" stroke-width="3"/><circle cx="60" cy="0" r="4.5" fill="#ffd23f"/>'},
+    {f:'<path d="M22 62 Q22 20 60 20 Q98 20 98 62" stroke="#222" stroke-width="6" fill="none"/><rect x="13" y="52" width="15" height="24" rx="6" fill="#222"/><rect x="92" y="52" width="15" height="24" rx="6" fill="#222"/>'},
+    {f:'<rect x="94" y="70" width="8" height="32" rx="3" fill="#444" transform="rotate(20 98 86)"/><circle cx="92" cy="66" r="10" fill="#bbb" stroke="#444" stroke-width="3"/>'},
+    {f:'<g transform="translate(80 28)"><path d="M0 0 L-15 -10 L-15 10 Z" fill="#ff006e" stroke="#fff" stroke-width="1.5"/><path d="M0 0 L15 -10 L15 10 Z" fill="#ff006e" stroke="#fff" stroke-width="1.5"/><circle r="4.5" fill="#c9184a"/></g>'},
+    {f:'<rect x="40" y="0" width="40" height="28" rx="3" fill="#222"/><rect x="40" y="19" width="40" height="5" fill="#e63946"/><rect x="28" y="26" width="64" height="7" rx="3.5" fill="#222"/>'},
+    {f:'<path d="M28 38 Q28 12 60 12 Q92 12 92 38 Z" fill="#e63946"/><path d="M84 34 L112 36 Q114 42 104 42 L84 40 Z" fill="#b5172f"/><circle cx="60" cy="12" r="3.5" fill="#b5172f"/>'},
+    {f:'<ellipse cx="60" cy="10" rx="22" ry="6" fill="none" stroke="#ffd23f" stroke-width="5"/>'},
+    {f:'<path d="M12 34 Q60 46 108 34 Q102 44 60 45 Q18 44 12 34 Z" fill="#8b5a2b"/><path d="M36 35 Q36 8 50 9 Q60 16 70 9 Q84 8 84 35 Z" fill="#a0692f"/><rect x="36" y="28" width="48" height="5" fill="#5a3410"/>'},
+    {b:'<g fill="#2b1a0e"><circle cx="28" cy="48" r="17"/><circle cx="38" cy="26" r="19"/><circle cx="60" cy="16" r="21"/><circle cx="82" cy="26" r="19"/><circle cx="92" cy="48" r="17"/></g>',f:''},
+    {f:'<path d="M28 42 Q22 6 62 6 Q98 8 100 32 Q86 20 72 27 Q60 12 46 29 Q36 31 28 42 Z" fill="#1b1b1b"/>'}
+  ];
+  const svgOf=c=>{const F=COLORS[c.color],sh=SHAPES[c.shape](F),a=ACCS[c.acc];return `<svg viewBox="-5 -8 130 128"><ellipse cx="60" cy="114" rx="32" ry="5" fill="rgba(0,0,0,.25)"/>${a.b||''}${sh.back||''}${sh.body}<ellipse cx="42" cy="44" rx="9" ry="5" fill="rgba(255,255,255,.35)" transform="rotate(-25 42 44)"/>${FACES[c.face]}${a.f||''}</svg>`;};
+
+  // ===== convidados fixos do exemplo
+  const G={
+    ana:{n:'Ana',c:{shape:4,color:5,face:1,acc:4}},
+    joao:{n:'João',c:{shape:0,color:3,face:2,acc:6}},
+    leo:{n:'Léo',c:{shape:6,color:8,face:6,acc:2}},
+    bia:{n:'Bia',c:{shape:3,color:1,face:5,acc:7}},
+    rafa:{n:'Rafa',c:{shape:1,color:9,face:9,acc:10}},
+    carla:{n:'Carla',c:{shape:7,color:10,face:4,acc:1}},
+    dudu:{n:'Dudu',c:{shape:2,color:4,face:7,acc:8}},
+    mari:{n:'Mari',c:{shape:5,color:0,face:3,acc:9}}
+  };
+  const ALL=Object.values(G);
+  const SONGS=[['Bohemian Rhapsody','Queen'],['Garota de Ipanema','Tom Jobim'],['Dancing Queen','ABBA'],['Tempo Perdido','Legião Urbana'],["Sweet Child O' Mine","Guns N' Roses"],['Ai Se Eu Te Pego','Michel Teló'],['I Will Survive','Gloria Gaynor'],['Exagerado','Cazuza'],["Livin' on a Prayer",'Bon Jovi'],['Anunciação','Alceu Valença'],['Shallow','Lady Gaga & Bradley Cooper'],['Pais e Filhos','Legião Urbana']];
+  const FINAL=['Evidências','Chitãozinho & Xororó'];
+
+  const stage=document.getElementById('stage');
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  let runId=0,singers=1,lastCase='random';
+  const rnd=a=>a[Math.floor(Math.random()*a.length)];
+  const names=arr=>arr.map(p=>p.n).join(' & ');
+
+  function lobby(){
+    stage.innerHTML=`<div class="scene">
+      <div class="kicker">🎤 Karaokê da festa</div>
+      <div class="lob-row">${ALL.map(p=>`<div>${svgOf(p.c)}${p.n}</div>`).join('')}</div>
+      <div class="sa">12 músicas na fila · 8 cantores</div>
+      <button class="bigbtn" id="go">🎲 SORTEAR</button></div>`;
+    document.getElementById('go').onclick=()=>run(lastCase);
+  }
+
+  async function run(kind){
+    const id=++runId,alive=()=>id===runId;
+    lastCase=kind;
+    const duo=singers===2;
+    const sugg=kind==='own'?G.ana:G.joao;
+    const pair={random:G.leo,dedic:G.bia,own:G.rafa}[kind];
+    const chosen=duo?[G.ana,pair]:[G.ana];
+
+    // 1. música
+    stage.innerHTML=`<div class="scene"><div class="kicker">Sorteando a música…</div><div class="reel" id="reel"></div><div class="sa">12 músicas na fila</div></div>`;
+    const reel=document.getElementById('reel');
+    let d=45;
+    for(let i=0;i<24;i++){if(!alive())return;const s=SONGS[i%SONGS.length];reel.innerHTML=`<div class="st">${s[0]}</div><div class="sa">${s[1]}</div>`;await sleep(d);d*=1.12;}
+    if(!alive())return;
+    reel.innerHTML=`<div class="st">${FINAL[0]}</div><div class="sa">${FINAL[1]}</div><div class="by">sugerida por ${svgOf(sugg.c)} <b>${sugg.n}</b>${kind==='dedic'?' &nbsp;💌 indicada para <b>Ana</b>':''}</div>`;
+    reel.classList.add('land');
+    await sleep(1900);if(!alive())return;
+
+    // 2. solo ou dupla
+    stage.innerHTML=`<div class="scene"><div class="kicker">Solo ou dupla?</div><div class="coinwrap"><div class="coin" style="--end:${duo?1980:1800}deg"><div class="f"><span>🎤</span>SOLO</div><div class="f b"><span>🎤🎤</span>DUPLA</div></div></div></div>`;
+    await sleep(2300);if(!alive())return;
+
+    // 3. quem canta
+    stage.innerHTML=`<div class="scene"><div class="kicker">Quem vai cantar?</div><div class="slots">${chosen.map((_,i)=>`<div class="slot" id="slot${i}"></div>`).join('')}</div></div>`;
+    for(let k=0;k<chosen.length;k++){
+      const el=document.getElementById('slot'+k);let dd=55;
+      for(let i=0;i<20;i++){if(!alive())return;const p=ALL[(i*3+k*5)%ALL.length];el.innerHTML=svgOf(p.c)+`<b>${p.n}</b>`;await sleep(dd);dd*=1.13;}
+      if(!alive())return;
+      el.innerHTML=svgOf(chosen[k].c)+`<b>${chosen[k].n}</b>`;el.classList.add('land');
+      await sleep(600);
+    }
+    await sleep(700);if(!alive())return;
+
+    // 4. revelação
+    const avs=`<div class="rv-avs">${chosen.map(p=>`<div class="rv-av">${kind==='own'&&p===G.ana?'<div class="crown">👑</div>':''}${svgOf(p.c)}<b>${p.n}</b></div>`).join('')}</div>`;
+    if(kind==='random'){
+      const cols=['#ffd23f','#ff5d8f','#4cc9f0','#3ddc97','#9b5de5','#fb8500','#fff'];
+      const conf=Array.from({length:90},()=>`<i style="left:${Math.random()*100}%;background:${rnd(cols)};animation-duration:${2+Math.random()*2}s;animation-delay:${Math.random()*.8}s"></i>`).join('');
+      stage.innerHTML=`<div class="scene"><div class="fx confetti">${conf}</div>
+        <div class="rv-title">🎲 SURPRESA!</div>${avs}
+        <div class="rv-sub">${duo?'<b>Ana & Léo</b> vão':'<b>Ana</b> vai'} cantar a música que o <b>João</b> escolheu. Ninguém escapa!</div></div>`;
+      await sleep(4200);
+    }else if(kind==='dedic'){
+      stage.innerHTML=`<div class="scene"><div class="kicker">Chegou uma dedicatória…</div>
+        <div class="env"><div class="bd"></div><div class="letter"><small>De: João</small>Para: Ana 💌<small>"essa é a sua cara!"</small></div><div class="flap"></div><div class="seal">❤️</div></div></div>`;
+      await sleep(3000);if(!alive())return;
+      const hs=Array.from({length:30},()=>`<span style="left:${Math.random()*100}%;animation-duration:${2.5+Math.random()*2}s;animation-delay:${Math.random()*1.5}s">${rnd(['❤️','💖','💕','💗'])}</span>`).join('');
+      stage.innerHTML=`<div class="scene"><div class="fx hearts">${hs}</div>
+        <div class="rv-title">💌 INDICADA!</div>${avs}
+        <div class="rv-sub"><b>João</b> indicou essa música para <b>Ana</b>${duo?' — e <b>Bia</b> vai junto na dupla!':'!'}</div></div>`;
+      await sleep(4200);
+    }else{
+      const tw=Array.from({length:22},()=>`<span style="left:${Math.random()*96}%;top:${Math.random()*90}%;animation-delay:${Math.random()*1.4}s">✨</span>`).join('');
+      stage.innerHTML=`<div class="scene" style="background:#07020f"><div class="drum">🥁 E quem pediu essa música…</div></div>`;
+      await sleep(1600);if(!alive())return;
+      stage.innerHTML=`<div class="scene" style="background:radial-gradient(ellipse at 50% 70%,#2a0c40,#07020f 70%)"><div class="fx"><div class="spot l"></div><div class="spot r"></div></div><div class="fx twinkle">${tw}</div>
+        <div class="rv-title">⭐ PEDIU, CANTOU!</div>${avs}
+        <div class="rv-sub"><b>Ana</b> escolheu essa música. O palco é seu!${duo?' <b>Rafa</b> sobe junto na dupla.':''}</div></div>`;
+      await sleep(4400);
+    }
+    if(!alive())return;
+
+    // 5. player
+    const badge={random:['random','🎲 Surpresa'],dedic:['dedic','💌 Indicada para Ana'],own:['own','⭐ Escolha própria']}[kind];
+    stage.innerHTML=`<div class="player">
+      <div class="pl-top"><div class="pl-song"><div class="t">🎵 ${FINAL[0]}</div><div class="a">${FINAL[1]} · karaokê</div></div><div class="badge ${badge[0]}">${badge[1]}</div></div>
+      <div class="pl-video" id="vid"><div class="ph"></div><button class="play" id="play">▶</button><div class="hint">vídeo do YouTube aqui</div></div>
+      <div class="pl-bottom">
+        <div class="who">${svgOf(sugg.c)}<div><small>Sugerida por</small><b>${sugg.n}</b></div></div>
+        <div class="who sing">${chosen.map(p=>svgOf(p.c)).join('')}<div><small>No microfone</small><b>${names(chosen)}</b></div></div>
+        <div class="pl-q">11 músicas na fila<button class="nextbtn" id="next">🎲 Sortear a próxima</button></div>
+      </div></div>`;
+    document.getElementById('play').onclick=()=>{document.getElementById('vid').innerHTML='<div class="ph"></div><div class="eq">'+Array.from({length:9},(_,i)=>`<i style="animation-delay:${i*.09}s"></i>`).join('')+'</div><div class="hint">▶ tocando…</div>';};
+    document.getElementById('next').onclick=lobby;
+  }
+
+  document.querySelectorAll('.ctrl [data-case]').forEach(b=>b.onclick=()=>{document.querySelectorAll('.ctrl [data-case]').forEach(x=>x.classList.toggle('on',x===b));run(b.dataset.case);});
+  document.querySelectorAll('.ctrl [data-n]').forEach(b=>b.onclick=()=>{singers=+b.dataset.n;document.querySelectorAll('.ctrl [data-n]').forEach(x=>x.classList.toggle('on',x===b));});
+  lobby();
+})();
+</script>

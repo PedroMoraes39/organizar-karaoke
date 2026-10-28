@@ -1,0 +1,177 @@
+<style>
+  .wrap{display:grid;grid-template-columns:auto 1fr;gap:2rem;align-items:start;margin-top:1rem}
+  @media (max-width:820px){.wrap{grid-template-columns:1fr}}
+  .phone{width:310px;height:660px;border-radius:34px;border:8px solid #111;background:linear-gradient(170deg,#2a0f5c 0%,#5b1680 50%,#a8286f 100%);color:#fff;overflow:hidden;font-family:system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.35);margin:0 auto;position:relative}
+  .screen{position:absolute;inset:0;display:flex;flex-direction:column;transition:transform .35s cubic-bezier(.3,.8,.3,1)}
+  #s2{transform:translateX(100%)}
+  .phone.add #s1{transform:translateX(-30%)}
+  .phone.add #s2{transform:translateX(0)}
+  #s2{background:linear-gradient(170deg,#2a0f5c 0%,#5b1680 50%,#a8286f 100%);box-shadow:-10px 0 30px rgba(0,0,0,.35)}
+  .top{display:flex;align-items:center;gap:8px;padding:14px 14px 8px}
+  .top svg{width:44px;height:44px}
+  .top b{font-size:15px;display:block}
+  .top small{font-size:11px;color:#e3d2ff}
+  .hdr{display:flex;align-items:center;gap:8px;padding:14px 12px 8px}
+  .hdr button{border:none;background:rgba(255,255,255,.18);color:#fff;border-radius:10px;padding:6px 10px;font-weight:800;font-size:12px;cursor:pointer}
+  .hdr b{font-size:16px}
+  .h1{font-size:19px;font-weight:900;padding:2px 16px 6px;display:flex;justify-content:space-between;align-items:baseline}
+  .h1 span{font-size:11px;color:#e3d2ff;font-weight:700}
+  .scroll{flex:1;overflow-y:auto;padding:4px 12px 12px;display:flex;flex-direction:column;gap:8px}
+  .foot{padding:10px 12px 14px;background:linear-gradient(transparent,rgba(42,15,92,.6) 30%)}
+  .cta{width:100%;border:none;border-radius:14px;padding:13px;font-weight:900;font-size:15px;background:#ffd23f;color:#3a1a00;box-shadow:0 4px 0 #c99a00;cursor:pointer}
+  .cta:disabled{opacity:.45;cursor:default}
+  .card{background:#fff;color:#2a1640;border-radius:14px;padding:9px;display:flex;gap:9px;align-items:center}
+  .card.new{animation:glow 1.6s}
+  .thumb{width:58px;height:34px;border-radius:7px;background:linear-gradient(135deg,#ff0033,#ff7a59);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;flex-shrink:0}
+  .card .meta{flex:1;min-width:0}
+  .card .tt{font-size:12px;font-weight:800;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .card .tag{font-size:10.5px;color:#d23c84;font-weight:800;margin-top:2px}
+  .card .tag.no{color:#a08abf}
+  .card .del{border:none;background:#fdecef;border-radius:9px;width:30px;height:30px;cursor:pointer;font-size:13px;flex-shrink:0}
+  .sec{font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:#e3d2ff;margin:8px 4px 0}
+  .card.done{background:rgba(255,255,255,.75)}
+  .card.done .tt{color:#6e5a86}
+  .card .sung{font-size:10.5px;color:#2e9e5b;font-weight:800;margin-top:2px}
+  .empty{text-align:center;padding:30px 10px;color:#e3d2ff;font-size:13px;line-height:1.5}
+  .empty div{font-size:44px}
+  .box{background:#fff;color:#2a1640;border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:9px}
+  .box h4{font-size:13px;font-weight:900;color:#6b1d8f;margin:0;display:flex;justify-content:space-between}
+  .box h4 span{color:#a08abf;font-weight:700;font-size:11px}
+  .inp{display:flex;gap:6px}
+  .inp input{flex:1;min-width:0;border:2px solid #e4d6f5;border-radius:10px;padding:9px;font-size:12px;color:#2a1640;background:#faf6ff}
+  .inp button{border:none;border-radius:10px;background:#efe5fb;color:#6b1d8f;font-weight:800;font-size:11px;padding:0 8px;cursor:pointer}
+  .pv{display:none;gap:8px;align-items:center;background:#f6f0fd;border-radius:10px;padding:6px}
+  .pv.on{display:flex;animation:fade .3s}
+  .pv .tt{font-size:11.5px;font-weight:800;line-height:1.2}
+  .pv .ok{font-size:10px;color:#2e9e5b;font-weight:700}
+  .search{border:2px solid #e4d6f5;border-radius:10px;padding:7px 9px;font-size:12px;color:#2a1640;background:#faf6ff}
+  .people{display:flex;flex-direction:column;gap:4px}
+  .pp{display:flex;align-items:center;gap:8px;cursor:pointer;padding:3px 8px 3px 3px;border-radius:12px;border:2px solid #f1e9fb;background:#fff}
+  .pp svg{width:34px;height:34px;border-radius:50%;background:#f1e9fb;flex-shrink:0}
+  .pp i{font-style:normal;font-size:12.5px;font-weight:800;color:#2a1640;flex:1}
+  .pp i small{color:#a08abf;font-weight:700;font-size:11px}
+  .pp .ck{width:22px;height:22px;border-radius:50%;border:2px solid #d8c8ec;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+  .pp.on{border-color:#d23c84;background:#ffe3f0}
+  .pp.on .ck{background:#d23c84;border-color:#d23c84;color:#fff}
+  .pp.off{opacity:.4}
+  .none{font-size:11px;color:#a08abf;text-align:center;padding:8px}
+  .tip{font-size:10.5px;color:#7b6696;background:#faf6ff;border-radius:8px;padding:6px 8px;line-height:1.35}
+  .tip b{color:#d23c84}
+  .warn{font-size:10.5px;color:#c0392b;font-weight:700;display:none}
+  .toast{position:absolute;left:50%;top:70px;transform:translateX(-50%);background:#2e9e5b;color:#fff;font-size:12px;font-weight:800;padding:7px 14px;border-radius:99px;display:none;z-index:5;white-space:nowrap}
+  .toast.on{display:block;animation:fade .3s}
+  .notes{display:flex;flex-direction:column;gap:.8rem}
+  .notes div{background:var(--bg-secondary);border:1px solid var(--border);border-radius:12px;padding:.8rem 1rem;font-size:.9rem;color:var(--text-secondary)}
+  .notes b{color:var(--text-primary);display:block;margin-bottom:.15rem}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  @keyframes glow{0%{box-shadow:0 0 0 0 rgba(255,210,63,.9)}100%{box-shadow:0 0 0 14px rgba(255,210,63,0)}}
+</style>
+
+<h2>Celular em duas telas (v3)</h2>
+<p class="subtitle">Funciona de verdade: toque em "+ Adicionar música", cole um link (ou toque em "Exemplo"), marque até 2 pessoas, envie e volte para a lista.</p>
+
+<div class="wrap">
+  <div class="phone" id="phone">
+    <div class="toast" id="toast">Música enviada! 🎉</div>
+
+    <div class="screen" id="s1">
+      <div class="top" id="me"></div>
+      <div class="h1">Minhas músicas <span id="mc"></span></div>
+      <div class="scroll" id="list"></div>
+      <div class="foot"><button class="cta" id="open">＋ Adicionar música</button></div>
+    </div>
+
+    <div class="screen" id="s2">
+      <div class="hdr"><button id="back">← Voltar</button><b>Nova música</b></div>
+      <div class="scroll">
+        <div class="box">
+          <h4>🎵 Link do YouTube</h4>
+          <div class="inp"><input id="link" placeholder="Cole aqui o link"><button id="ex">Exemplo</button></div>
+          <div class="pv" id="pv"><div class="thumb">▶</div><div><div class="tt" id="pvt"></div><div class="ok">✓ vídeo encontrado</div></div></div>
+        </div>
+        <div class="box">
+          <h4>💌 Indicar para alguém? <span id="cnt"></span></h4>
+          <div class="tip" id="tip"></div>
+          <input class="search" id="q" placeholder="🔍 Buscar pelo nome">
+          <div class="warn" id="warn">Máximo de 2 pessoas. Desmarque alguém para trocar.</div>
+          <div class="people" id="people"></div>
+        </div>
+      </div>
+      <div class="foot"><button class="cta" id="send" disabled>Enviar para a fila 🎤</button></div>
+    </div>
+  </div>
+
+  <div class="notes">
+    <div><b>Tela 1 · Minhas músicas</b>É a tela inicial depois de entrar. Mostra suas músicas que ainda estão na fila (com a indicação, se tiver) e, embaixo, as que já foram sorteadas, com ✓ e quem cantou. O botão amarelo "＋ Adicionar música" fica sempre fixo no rodapé.</div>
+    <div><b>Tela 2 · Nova música</b>Abre deslizando por cima da tela 1. Tem o link (com o nome do vídeo para conferir) e a lista de indicação com busca. O botão "Enviar" fica fixo no rodapé e só acende depois de colar um link válido.</div>
+    <div><b>Depois de enviar</b>Volta sozinha para a tela 1, mostra "Música enviada! 🎉" e a música nova aparece no topo da lista, com um brilho rápido.</div>
+    <div><b>Lista vazia</b>Quem acabou de entrar vê um recado convidando a mandar a primeira música. Para ver, apague todas da lista.</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const S=(d,w=4)=>`<path d="${d}" stroke="#222" stroke-width="${w}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+  const dot=(x,y,r=6)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="#222"/><circle cx="${x+r/3}" cy="${y-r/3}" r="${r/3}" fill="#fff"/>`;
+  const heart=(cx,cy,s,fill)=>`<path d="M${cx} ${cy+s} C${cx-s*1.6} ${cy} ${cx-s} ${cy-s*1.2} ${cx} ${cy-s*.4} C${cx+s} ${cy-s*1.2} ${cx+s*1.6} ${cy} ${cx} ${cy+s} Z" fill="${fill}"/>`;
+  const star=(cx,cy,R,r,fill,st='stroke="#222" stroke-width="1.5"')=>{let p=[];for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,q=i%2?r:R;p.push((cx+q*Math.cos(a)).toFixed(1)+','+(cy+q*Math.sin(a)).toFixed(1));}return `<polygon points="${p.join(' ')}" fill="${fill}" ${st} stroke-linejoin="round"/>`;};
+  const SMILE=S('M48 76 Q60 88 72 76'),BS='stroke="#fff" stroke-width="3" stroke-linejoin="round"';
+  const BLOB='M60 24 C92 24 100 50 100 72 C100 98 84 108 60 108 C36 108 20 98 20 72 C20 50 28 24 60 24 Z';
+  const COLORS=['#ff5d8f','#ffb703','#3ddc97','#4cc9f0','#9b5de5','#f15bb5','#00bbf9','#fb8500','#80ed99','#e63946','#a0c4ff'];
+  const SH=[F=>`<path d="${BLOB}" fill="${F}" ${BS}/>`,F=>`<rect x="22" y="28" width="76" height="80" rx="18" fill="${F}" ${BS}/>`,F=>`<path d="M24 64 C24 38 40 24 60 24 C80 24 96 38 96 64 L96 106 L86 97 L76 106 L66 97 L56 106 L46 97 L36 106 L24 97 Z" fill="${F}" ${BS}/>`,F=>`<path d="M26 50 L28 12 L54 32 Z" fill="${F}" ${BS}/><path d="M94 50 L92 12 L66 32 Z" fill="${F}" ${BS}/><path d="${BLOB}" fill="${F}" ${BS}/>`,F=>`<circle cx="32" cy="32" r="13" fill="${F}" ${BS}/><circle cx="88" cy="32" r="13" fill="${F}" ${BS}/><path d="${BLOB}" fill="${F}" ${BS}/>`,F=>star(60,68,54,30,F,BS),F=>`<path d="M48 30 L38 6" stroke="#222" stroke-width="3"/><path d="M72 30 L82 6" stroke="#222" stroke-width="3"/><circle cx="38" cy="6" r="6" fill="${F}" ${BS}/><circle cx="82" cy="6" r="6" fill="${F}" ${BS}/><path d="${BLOB}" fill="${F}" ${BS}/>`,F=>`<path d="M60 10 C60 10 100 54 100 78 C100 98 84 108 60 108 C36 108 20 98 20 78 C20 54 60 10 60 10 Z" fill="${F}" ${BS}/>`];
+  const FA=[dot(47,58)+dot(73,58)+SMILE,S('M40 60 Q47 50 54 60')+S('M66 60 Q73 50 80 60')+'<ellipse cx="60" cy="80" rx="9" ry="11" fill="#5a0b1f"/>','<rect x="35" y="51" width="23" height="13" rx="5" fill="#111"/><rect x="62" y="51" width="23" height="13" rx="5" fill="#111"/>'+S('M50 78 Q60 84 72 74'),dot(47,58)+S('M66 58 Q73 52 80 58')+SMILE,heart(47,58,8,'#e63946')+heart(73,58,8,'#e63946')+SMILE,S('M41 52 L51 58 L41 64')+S('M79 52 L69 58 L79 64')+'<path d="M46 74 L74 74 Q74 92 60 92 Q46 92 46 74 Z" fill="#5a0b1f"/>'];
+  const AC=['','<path d="M38 30 L44 12 L52 24 L60 8 L68 24 L76 12 L82 30 Z" fill="#ffd23f" stroke="#c99a00" stroke-width="2"/>','<path d="M46 30 L60 0 L74 30 Z" fill="#4cc9f0" stroke="#fff" stroke-width="2"/><circle cx="60" cy="0" r="4.5" fill="#ffd23f"/>','<rect x="94" y="70" width="8" height="32" rx="3" fill="#444" transform="rotate(20 98 86)"/><circle cx="92" cy="66" r="10" fill="#bbb" stroke="#444" stroke-width="3"/>','<ellipse cx="60" cy="10" rx="22" ry="6" fill="none" stroke="#ffd23f" stroke-width="5"/>','<rect x="40" y="0" width="40" height="28" rx="3" fill="#222"/><rect x="28" y="26" width="64" height="7" rx="3.5" fill="#222"/>'];
+  const av=(s,c,f,a)=>`<svg viewBox="-5 -8 130 128">${SH[s](COLORS[c])}<ellipse cx="42" cy="44" rx="9" ry="5" fill="rgba(255,255,255,.35)" transform="rotate(-25 42 44)"/>${FA[f]}${AC[a]}</svg>`;
+
+  const ME={n:'Ana',svg:av(4,5,1,3)};
+  const PEOPLE=[{n:'João',svg:av(0,3,2,5)},{n:'Bia',svg:av(3,1,4,4)},{n:'Léo',svg:av(6,8,5,2)},{n:'Rafa',svg:av(1,9,0,0)},{n:'Carla',svg:av(7,10,3,1)},{n:'Dudu',svg:av(2,4,5,0)},{n:'Mari',svg:av(5,0,0,4)}];
+  ['Gabi','Pedro','Lu','Nando','Tati','Vini','Juju','Beto','Duda','Caio'].forEach((n,i)=>PEOPLE.push({n,svg:av((i*3)%8,(i*5+2)%11,(i*7+1)%6,(i*2+1)%6)}));
+  PEOPLE.sort((a,b)=>a.n.localeCompare(b.n,'pt-BR'));PEOPLE.unshift({n:ME.n,svg:ME.svg,me:true});
+  const label=n=>n===ME.n?'você':n;
+  const TITLES=['Evidências – Chitãozinho & Xororó (Karaokê)','Dancing Queen – ABBA (Karaoke Version)','Exagerado – Cazuza (Karaokê)','Shallow – Lady Gaga (Karaoke)','Tempo Perdido – Legião Urbana (Karaokê)'];
+  let list=[{t:'Bohemian Rhapsody – Queen (Karaoke)',to:['João','Léo']},{t:'Garota de Ipanema – Tom Jobim (Karaokê)',to:[]},{t:'I Will Survive – Gloria Gaynor (Karaoke)',to:['Bia'],done:'Bia cantou'},{t:'Pais e Filhos – Legião Urbana (Karaokê)',to:[],done:'Rafa & Dudu cantaram'}];
+  let sel=[],ti=0,curTitle='',q='';
+  const $=id=>document.getElementById(id),phone=$('phone');
+
+  $('me').innerHTML=`${ME.svg}<div><b>${ME.n}</b><small>👥 ${PEOPLE.length} pessoas na festa</small></div>`;
+
+  function drawList(fresh){
+    const L=$('list');L.innerHTML='';
+    const fila=list.filter(s=>!s.done),feitas=list.filter(s=>s.done);
+    $('mc').textContent=`${fila.length} na fila`;
+    if(!list.length){L.innerHTML='<div class="empty"><div>🎤</div>Você ainda não mandou nenhuma música.<br>Toque em <b>＋ Adicionar música</b> para começar!</div>';return;}
+    const mk=(s,isNew)=>{const d=document.createElement('div');d.className='card'+(s.done?' done':'')+(isNew?' new':'');
+      const sub=s.done?`<div class="sung">✓ ${s.done}</div>`:(s.to.length?`<div class="tag">💌 para ${s.to.join(' & ')}</div>`:'<div class="tag no">sem indicação</div>');
+      d.innerHTML=`<div class="thumb">▶</div><div class="meta"><div class="tt">${s.t}</div>${sub}</div>${s.done?'':'<button class="del" title="Apagar">🗑️</button>'}`;
+      const b=d.querySelector('.del');if(b)b.onclick=()=>{list.splice(list.indexOf(s),1);drawList();};
+      return d;};
+    fila.forEach((s,i)=>L.appendChild(mk(s,fresh&&i===0)));
+    if(feitas.length){const h=document.createElement('div');h.className='sec';h.textContent='Já sorteadas';L.appendChild(h);feitas.forEach(s=>L.appendChild(mk(s)));}
+  }
+
+  function drawPeople(){
+    const P=$('people');P.innerHTML='';
+    const shown=PEOPLE.filter(p=>!q||p.n.toLowerCase().includes(q)||(p.me&&'você'.includes(q)));
+    shown.forEach(p=>{const on=sel.includes(p.n);const d=document.createElement('div');d.className='pp'+(on?' on':'')+(!on&&sel.length>=2?' off':'');
+      d.innerHTML=p.svg+`<i>${p.n}${p.me?' <small>(você)</small>':''}</i><span class="ck">${on?'✓':''}</span>`;
+      d.onclick=()=>{if(on)sel=sel.filter(x=>x!==p.n);else if(sel.length<2)sel.push(p.n);else{$('warn').style.display='block';setTimeout(()=>$('warn').style.display='none',1800);return;}drawPeople();};
+      P.appendChild(d);});
+    if(!shown.length)P.innerHTML='<div class="none">Ninguém com esse nome na festa</div>';
+    $('cnt').textContent=sel.length?`${sel.length} de 2`:'opcional · até 2';
+    const nm=sel.map(label);
+    $('tip').innerHTML=!sel.length?'Sem indicação: entra no sorteio normal, e você tem um pouco mais de chance de cantar o que mandou.':sel.length===1?`Indicada para <b>${nm[0]}</b>: quando sair, ${nm[0]==='você'?'você tem':nm[0]+' tem'} bem mais chance de cantar.`:`Indicada para a dupla <b>${nm[0]} & ${nm[1]}</b>: quando sair, essa dupla tem bem mais chance de cantar junta.`;
+  }
+
+  function check(){const ok=/youtu/i.test($('link').value);if(ok){if(!curTitle)curTitle=TITLES[ti++%TITLES.length];$('pvt').textContent=curTitle;}else curTitle='';$('pv').classList.toggle('on',ok);$('send').disabled=!ok;}
+  function reset(){$('link').value='';curTitle='';sel=[];q='';$('q').value='';check();drawPeople();}
+
+  $('link').oninput=check;
+  $('ex').onclick=()=>{$('link').value='https://youtu.be/'+Math.random().toString(36).slice(2,13);curTitle='';check();};
+  $('q').oninput=e=>{q=e.target.value.trim().toLowerCase();drawPeople();};
+  $('open').onclick=()=>{reset();phone.classList.add('add');};
+  $('back').onclick=()=>phone.classList.remove('add');
+  $('send').onclick=()=>{list.unshift({t:curTitle,to:sel.map(label)});phone.classList.remove('add');drawList(true);const t=$('toast');t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1800);};
+
+  drawList();drawPeople();
+})();
+</script>
