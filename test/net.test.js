@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { pickLanIp } from '../server/net.js';
+import { pickLanIp, wslNatHint } from '../server/net.js';
 import { isLoopback } from '../server/admin.js';
 
 const nic = (address, internal = false) => ({ family: 'IPv4', address, internal });
@@ -18,4 +18,13 @@ test('isLoopback', () => {
   for (const a of ['127.0.0.1', '::1', '::ffff:127.0.0.1']) assert.equal(isLoopback(a), true, a);
   assert.equal(isLoopback('192.168.0.5'), false);
   assert.equal(isLoopback(undefined), false);
+});
+
+test('wslNatHint avisa quando o QR vai mostrar o IP interno do WSL', () => {
+  const wsl = 'Linux version 6.6.87.2-microsoft-standard-WSL2';
+  assert.match(wslNatHint({ procVersion: wsl, ip: '172.30.82.251', override: null }), /KARAOKE_IP/);
+  assert.equal(wslNatHint({ procVersion: wsl, ip: '192.168.0.23', override: null }), null);
+  assert.equal(wslNatHint({ procVersion: wsl, ip: '172.30.82.251', override: '192.168.0.23' }), null);
+  assert.equal(wslNatHint({ procVersion: 'Linux version 6.8.0-generic', ip: '172.30.82.251', override: null }), null);
+  assert.equal(wslNatHint({ procVersion: '', ip: '172.30.82.251', override: null }), null);
 });

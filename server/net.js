@@ -23,3 +23,14 @@ export function pickLanIp(interfaces = os.networkInterfaces(), override = null) 
   }
   return best ?? '127.0.0.1';
 }
+
+// No WSL2 em modo NAT o IP detectado (172.16–31.*) é interno: os celulares não chegam nele.
+export function wslNatHint({ procVersion, ip, override }) {
+  if (override || !/microsoft/i.test(procVersion ?? '')) return null;
+  if (!/^172\.(1[6-9]|2\d|3[01])\./.test(ip)) return null;
+  return [
+    `⚠️  ${ip} é o endereço interno do WSL: os celulares não vão conseguir entrar por ele.`,
+    '   Veja a seção "WSL2" do README (rede espelhada + firewall) e rode com o IP do notebook no Wi-Fi:',
+    '   KARAOKE_IP=192.168.x.x npm start',
+  ].join('\n');
+}

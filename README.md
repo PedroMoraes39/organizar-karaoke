@@ -45,17 +45,34 @@ New-NetFirewallRule -DisplayName "Karaoke" -Direction Inbound -LocalPort 3000 -P
 
 ### WSL2 (Linux dentro do Windows)
 
-Na configuração padrão do WSL2 os celulares **não alcançam** o programa. Escolha uma das opções:
+Na configuração padrão do WSL2 (modo NAT) os celulares **não alcançam** o programa, e o QR code mostra um IP interno (`172.x.x.x`). O `npm start` avisa quando isso acontece. Escolha uma das opções:
 
-- **Rede espelhada (Windows 11):** crie ou edite o arquivo `%UserProfile%\.wslconfig` com
+- **Rede espelhada (Windows 11 22H2 ou mais novo, recomendado).**
+  1. Crie ou edite o arquivo `%UserProfile%\.wslconfig` com
 
-  ```ini
-  [wsl2]
-  networkingMode=mirrored
+     ```ini
+     [wsl2]
+     networkingMode=mirrored
+     ```
+
+  2. Rode `wsl --shutdown` no PowerShell e abra o WSL de novo.
+  3. No modo espelhado quem bloqueia a entrada é o **firewall do Hyper-V**. Libere a porta no PowerShell **como administrador**:
+
+     ```powershell
+     New-NetFirewallHyperVRule -Name Karaoke -DisplayName Karaoke -Direction Inbound -VMCreatorId '{40E0AC32-46A5-438A-A0B2-2B479E8F2E90}' -Protocol TCP -LocalPorts 3000
+     ```
+
+     e também a regra normal do Windows (comando da seção acima).
+- **Encaminhamento de porta (Windows 10 ou modo NAT).** No WSL, descubra o IP interno com `hostname -I`. No PowerShell **como administrador**:
+
+  ```powershell
+  netsh interface portproxy add v4tov4 listenport=3000 listenaddress=0.0.0.0 connectport=3000 connectaddress=<IP-do-WSL>
   ```
 
-  Depois rode `wsl --shutdown` no PowerShell, abra o WSL de novo e libere a porta no firewall (comando acima).
+  Libere a porta no firewall (comando da seção acima) e inicie informando o IP do notebook no Wi-Fi: `KARAOKE_IP=192.168.x.x npm start`. O IP interno do WSL muda quando o Windows reinicia; aí é preciso refazer o `portproxy`.
 - **Ou rode o Node direto no Windows:** instale o Node no Windows e rode `npm install` e `npm start` numa pasta do Windows.
+
+Fontes: [Microsoft Learn, rede no WSL](https://learn.microsoft.com/windows/wsl/networking).
 
 ### O QR code mostra o IP errado?
 
