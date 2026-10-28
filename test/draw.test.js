@@ -49,6 +49,14 @@ test('pickSingers: distintos e sem quem cantou antes quando dá', () => {
   }
 });
 
+test('pickSingers: com pouca gente, quem não cantou entra antes de repetir', () => {
+  const song = { id: 9, suggestedBy: 1, indicated: [] };
+  for (let s = 1; s <= 200; s++) {
+    const ids = pickSingers({ guests: [g(1, 1), g(2, 1), g(3)], song, count: 2, lastRoundIds: [1, 2], excludeIds: [], weights: W, rng: mulberry32(s) });
+    assert.ok(ids.includes(3), `semente ${s}: ${ids}`);
+  }
+});
+
 test('pickSingers: nunca devolve mais gente do que existe', () => {
   const song = { id: 9, suggestedBy: 99, indicated: [] };
   assert.deepEqual(pickSingers({ guests: [g(1)], song, count: 2, lastRoundIds: [], excludeIds: [], weights: W, rng: seq([0.5]) }), [1]);

@@ -40,13 +40,20 @@ export function singerWeight(guest, song, weights) {
   return w;
 }
 
+// Quem não cantou na rodada anterior é sorteado primeiro; quem cantou só completa as vagas que faltarem.
 export function pickSingers({ guests, song, count, lastRoundIds, excludeIds, weights, rng }) {
-  const pool = [...eligiblePool({ guests, needed: count, lastRoundIds, excludeIds })];
+  const excluded = new Set(excludeIds);
+  const last = new Set(lastRoundIds);
+  const allowed = guests.filter(g => !excluded.has(g.id));
+  const tiers = [allowed.filter(g => !last.has(g.id)), allowed.filter(g => last.has(g.id))];
   const picked = [];
-  while (picked.length < count && pool.length) {
-    const g = weightedPick(pool, x => singerWeight(x, song, weights), rng);
-    picked.push(g.id);
-    pool.splice(pool.indexOf(g), 1);
+  for (const tier of tiers) {
+    const pool = [...tier];
+    while (picked.length < count && pool.length) {
+      const g = weightedPick(pool, x => singerWeight(x, song, weights), rng);
+      picked.push(g.id);
+      pool.splice(pool.indexOf(g), 1);
+    }
   }
   return picked;
 }
