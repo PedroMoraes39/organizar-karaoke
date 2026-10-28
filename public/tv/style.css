@@ -24,10 +24,10 @@ button { font: inherit; cursor: pointer; }
 .qr-card small { font-size: 1.5cqw; color: #6b1d8f; font-weight: 800; word-break: break-all; }
 .lobby-main { display: flex; flex-direction: column; align-items: center; gap: 2cqw; text-align: center; }
 .lobby-title { font-size: 4.4cqw; font-weight: 900; margin: 0; }
-.lob-row { display: flex; gap: 1.2cqw; flex-wrap: wrap; justify-content: center; max-height: 22cqw; overflow: hidden; }
-.lob-row .g { display: flex; flex-direction: column; align-items: center; font-size: 1.4cqw; font-weight: 700; width: 7.5cqw; }
+.lob-row { display: flex; gap: 1.2cqw; flex-wrap: wrap; justify-content: center; max-height: 26cqw; overflow: hidden; }
+.lob-row .g { display: flex; flex-direction: column; align-items: center; font-size: 1.4cqw; font-weight: 700; width: calc(var(--av, 7cqw) + .5cqw); }
 .lob-row .g span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.lob-row svg { width: 7cqw; height: 7cqw; animation: kxBounce 1.4s ease-in-out infinite; }
+.lob-row svg { width: var(--av, 7cqw); height: var(--av, 7cqw); animation: kxBounce 1.4s ease-in-out infinite; }
 .lob-row .g:nth-child(even) svg { animation-delay: .7s; }
 .lob-empty { font-size: 2.2cqw; color: #d9c8f0; }
 .bigbtn {

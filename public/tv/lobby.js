@@ -1,6 +1,13 @@
 import { renderAvatar } from '../shared/avatar.js';
 import { escapeHtml } from '../shared/escape.js';
 
+// Personagens encolhem conforme a festa enche, para caberem todos (até ~24) no lobby.
+function avatarSize(count) {
+  if (count <= 12) return '7cqw';
+  if (count <= 18) return '5.4cqw';
+  return '4.4cqw';
+}
+
 function reasonFor(state) {
   if (!state.guests.length) return 'Ninguém na festa ainda';
   if (!state.queueCount) return 'A fila está vazia: mandem músicas!';
@@ -30,6 +37,7 @@ export function renderLobby(stage, state, { onDraw, onNewParty }) {
   function update(next) {
     $('qr').innerHTML = next.qrSvg;
     $('url').textContent = next.joinUrl;
+    $('guests').style.setProperty('--av', avatarSize(next.guests.length));
     $('guests').innerHTML = next.guests.length
       ? next.guests.map(g => `<div class="g">${renderAvatar(g.avatar)}<span>${escapeHtml(g.name)}</span></div>`).join('')
       : '<div class="lob-empty">Leia o QR code para entrar na festa!</div>';
