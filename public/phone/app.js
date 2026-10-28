@@ -1,5 +1,6 @@
 import { renderEntry, renderReclaim } from './entry.js';
 import { renderSongs, renderAdd } from './songs.js';
+import { createEmitter } from '../shared/emitter.js';
 
 const TOKEN_KEY = 'karaoke.token';
 const tokenStore = {
@@ -14,7 +15,10 @@ const state = { me: null, guests: [], mySongs: [], screen: 'loading', draft: { n
 let view = null;
 
 const socket = window.io({ auth: { role: 'guest' } });
-const emit = (event, data = {}) => new Promise(resolve => socket.emit(event, data, resolve));
+// Envios esperam a conexão (e o guest:resume) e sempre terminam, com resposta ou 'timeout'.
+const emitter = createEmitter(socket);
+emitter.hold();
+const emit = (event, data = {}) => emitter.emit(event, data);
 
 function joined(guest, token) {
   tokenStore.set(token);
@@ -24,7 +28,11 @@ function joined(guest, token) {
 }
 
 async function leave() {
-  await emit('guest:leave');
+  const r = await emit('guest:leave');
+  if (!r.ok) {
+    window.alert('Sem conexão com a festa. Tente de novo.');
+    return;
+  }
   tokenStore.clear();
   state.me = null;
   state.mySongs = [];
@@ -68,20 +76,27 @@ socket.on('connect', async () => {
   offline.hidden = true;
   const token = tokenStore.get();
   if (token) {
-    const r = await emit('guest:resume', { token });
+    const r = await emitter.emit('guest:resume', { token }, { wait: false });
     if (r.ok) {
       state.me = r.guest;
+      emitter.release();
       if (state.screen === 'loading' || state.screen === 'entry' || state.screen === 'reclaim') showScreen('songs');
       return;
     }
-    tokenStore.clear();
-    state.me = null;
+    if (r.error === 'unknown') {
+      tokenStore.clear();
+      state.me = null;
+    }
   }
+  emitter.release();
   if (state.screen === 'loading' || state.me === null && state.screen !== 'entry' && state.screen !== 'reclaim') {
     showScreen('entry');
   }
 });
-socket.on('disconnect', () => { offline.hidden = false; });
+socket.on('disconnect', () => {
+  offline.hidden = false;
+  emitter.hold();
+});
 socket.on('guests', list => {
   state.guests = list;
   if (state.screen === 'songs') view?.update();

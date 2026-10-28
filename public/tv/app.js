@@ -1,11 +1,14 @@
 import { renderLobby, renderForbidden } from './lobby.js';
 import { playDraw, playReplace } from './sequence.js';
 import { renderPlayer } from './player.js';
+import { createEmitter } from '../shared/emitter.js';
 
 const stage = document.getElementById('stage');
 const key = new URLSearchParams(location.search).get('key');
 const socket = window.io({ auth: { role: 'tv', key } });
-const emit = (event, data = {}) => new Promise(resolve => socket.emit(event, data, resolve));
+// Toda chamada termina (resposta ou 'timeout'), para a TV nunca ficar presa em busy.
+const emitter = createEmitter(socket);
+const emit = (event, data = {}) => emitter.emit(event, data, { wait: false });
 
 // busy = uma animação está rodando; nesse meio tempo tv:state só atualiza os dados.
 const app = { tvState: null, busy: false, screen: null, view: null, roundId: null };
@@ -36,13 +39,23 @@ function showRound(round) {
   });
 }
 
+// Depois de uma falha, a tela segue o último estado conhecido do servidor.
+function showLatest() {
+  if (app.tvState?.phase === 'round') showRound(app.tvState.round);
+  else goLobby();
+}
+
 async function runDraw() {
   app.screen = 'animating';
-  const r = await emit('tv:draw');
-  if (r.ok) await playDraw(stage, r);
-  app.busy = false;
+  let r = { ok: false };
+  try {
+    r = await emit('tv:draw');
+    if (r.ok) await playDraw(stage, r);
+  } finally {
+    app.busy = false;
+  }
   if (r.ok) showRound(r.round);
-  else goLobby();
+  else showLatest();
 }
 
 async function startDraw() {
@@ -68,8 +81,11 @@ async function replaceSinger(slot) {
   }
   app.busy = true;
   app.screen = 'animating';
-  await playReplace(stage, r, slot);
-  app.busy = false;
+  try {
+    await playReplace(stage, r, slot);
+  } finally {
+    app.busy = false;
+  }
   showRound(r.round);
 }
 

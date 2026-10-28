@@ -11,6 +11,7 @@ const TABS = [
 const ERRORS = {
   invalid_name: 'Escreva um nome com até 20 letras.',
   invalid_avatar: 'Escolha seu personagem de novo.',
+  timeout: 'Sem conexão com a festa. Tente de novo.',
 };
 
 // Tela de entrada: nome + montagem do personagem (mockups/personagem.html).

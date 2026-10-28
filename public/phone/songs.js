@@ -10,6 +10,7 @@ const ERRORS = {
   invalid_indicated: 'Alguém que você indicou saiu da festa. Confira a lista.',
   note_too_long: 'O recadinho pode ter até 60 letras.',
   invalid_title: 'Preencha o nome da música.',
+  timeout: 'Sem conexão com a festa. Tente de novo.',
 };
 const errorText = code => ERRORS[code] ?? 'Não deu certo. Tente de novo.';
 
