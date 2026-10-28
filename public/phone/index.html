@@ -3,9 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2a0f5c">
   <title>Karaokê da Festa</title>
+  <link rel="stylesheet" href="/phone/style.css">
 </head>
 <body>
+  <div id="offline" class="offline" hidden>Reconectando…</div>
   <div id="app"></div>
+  <script src="/socket.io/socket.io.min.js"></script>
+  <script type="module" src="/phone/app.js"></script>
 </body>
 </html>
