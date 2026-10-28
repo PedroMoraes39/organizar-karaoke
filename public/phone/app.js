@@ -1,5 +1,5 @@
 import { renderEntry, renderReclaim } from './entry.js';
-import { escapeHtml } from '../shared/escape.js';
+import { renderSongs, renderAdd } from './songs.js';
 
 const TOKEN_KEY = 'karaoke.token';
 const tokenStore = {
@@ -11,6 +11,7 @@ const tokenStore = {
 const root = document.getElementById('app');
 const offline = document.getElementById('offline');
 const state = { me: null, guests: [], mySongs: [], screen: 'loading', draft: { name: '', avatar: null } };
+let view = null;
 
 const socket = window.io({ auth: { role: 'guest' } });
 const emit = (event, data = {}) => new Promise(resolve => socket.emit(event, data, resolve));
@@ -22,8 +23,18 @@ function joined(guest, token) {
   showScreen('songs');
 }
 
-function showScreen(name) {
+async function leave() {
+  await emit('guest:leave');
+  tokenStore.clear();
+  state.me = null;
+  state.mySongs = [];
+  showScreen('entry');
+}
+
+function showScreen(name, opts = {}) {
   state.screen = name;
+  view = null;
+  window.scrollTo(0, 0);
   if (name === 'entry') {
     renderEntry(root, {
       emit,
@@ -37,7 +48,19 @@ function showScreen(name) {
   } else if (name === 'reclaim') {
     renderReclaim(root, { emit, guest: state.reclaimGuest, onJoined: joined, onNo: () => showScreen('entry') });
   } else if (name === 'songs') {
-    root.innerHTML = `<div class="screen"><h1 class="ttl">Você está na festa, ${escapeHtml(state.me.name)}!</h1></div>`;
+    view = renderSongs(root, state, {
+      emit,
+      onAdd: () => showScreen('add'),
+      onLeave: leave,
+      flashSongId: opts.flashSongId ?? null,
+      toast: Boolean(opts.toast),
+    });
+  } else if (name === 'add') {
+    view = renderAdd(root, state, {
+      emit,
+      onBack: () => showScreen('songs'),
+      onSent: song => showScreen('songs', { flashSongId: song.id, toast: true }),
+    });
   }
 }
 
@@ -59,8 +82,15 @@ socket.on('connect', async () => {
   }
 });
 socket.on('disconnect', () => { offline.hidden = false; });
-socket.on('guests', list => { state.guests = list; });
-socket.on('mySongs', list => { state.mySongs = list; });
+socket.on('guests', list => {
+  state.guests = list;
+  if (state.screen === 'songs') view?.update();
+  if (state.screen === 'add') view?.refreshPeople();
+});
+socket.on('mySongs', list => {
+  state.mySongs = list;
+  if (state.screen === 'songs') view?.update();
+});
 socket.on('party:reset', () => {
   tokenStore.clear();
   state.me = null;
