@@ -1,0 +1,46 @@
+/* Visual portado de docs/superpowers/specs/mockups/sorteio-tv.html.
+   O palco é 16:9 e todos os tamanhos usam cqw (1cqw = 1% da largura do palco). */
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: #07020f; overflow: hidden; }
+body { display: flex; align-items: center; justify-content: center; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+button { font: inherit; cursor: pointer; }
+
+.stage {
+  position: relative; width: min(100vw, 177.78vh); aspect-ratio: 16 / 9; overflow: hidden;
+  background: radial-gradient(ellipse at 50% 30%, #40116a, #12052a 72%);
+  color: #fff; container-type: inline-size; user-select: none;
+}
+.scene { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.8cqw; text-align: center; }
+.kicker { font-size: 2cqw; letter-spacing: .3em; text-transform: uppercase; color: #ffd23f; font-weight: 900; }
+.sa { font-size: 2.1cqw; color: #d9c8f0; }
+.msg-full { font-size: 3cqw; max-width: 70cqw; line-height: 1.4; }
+.msg-full code { color: #ffd23f; }
+
+/* ---------- lobby ---------- */
+.lobby { display: grid; grid-template-columns: 30cqw 1fr; gap: 3cqw; padding: 3cqw 4cqw; align-items: center; }
+.qr-card { background: #fff; color: #2a1640; border-radius: 2cqw; padding: 2cqw; display: flex; flex-direction: column; align-items: center; gap: 1cqw; text-align: center; box-shadow: 0 1cqw 3cqw rgba(0, 0, 0, .4); }
+.qr-card .qr svg { width: 24cqw; height: 24cqw; display: block; }
+.qr-card b { font-size: 1.9cqw; }
+.qr-card small { font-size: 1.5cqw; color: #6b1d8f; font-weight: 800; word-break: break-all; }
+.lobby-main { display: flex; flex-direction: column; align-items: center; gap: 2cqw; text-align: center; }
+.lobby-title { font-size: 4.4cqw; font-weight: 900; margin: 0; }
+.lob-row { display: flex; gap: 1.2cqw; flex-wrap: wrap; justify-content: center; max-height: 22cqw; overflow: hidden; }
+.lob-row .g { display: flex; flex-direction: column; align-items: center; font-size: 1.4cqw; font-weight: 700; width: 7.5cqw; }
+.lob-row .g span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lob-row svg { width: 7cqw; height: 7cqw; animation: kxBounce 1.4s ease-in-out infinite; }
+.lob-row .g:nth-child(even) svg { animation-delay: .7s; }
+.lob-empty { font-size: 2.2cqw; color: #d9c8f0; }
+.bigbtn {
+  border: none; border-radius: 2cqw; padding: 1.4cqw 5cqw; font-weight: 900; font-size: 3.4cqw;
+  background: #ffd23f; color: #3a1a00; box-shadow: 0 .8cqw 0 #c99a00; animation: pulse2 1.6s infinite;
+}
+.bigbtn:disabled { opacity: .4; animation: none; cursor: default; }
+.reason { font-size: 1.8cqw; color: #ffd6e8; min-height: 2.4cqw; }
+.newparty {
+  position: absolute; right: 1.5cqw; bottom: 1.2cqw; border: none; border-radius: 1cqw; padding: .6cqw 1.4cqw;
+  font-size: 1.2cqw; font-weight: 700; background: rgba(255, 255, 255, .1); color: #cdb8ec;
+}
+.newparty:hover { background: rgba(255, 255, 255, .2); }
+
+@keyframes kxBounce { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-5%) rotate(3deg); } }
+@keyframes pulse2 { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
