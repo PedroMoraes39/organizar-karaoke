@@ -1,0 +1,90 @@
+# Palavras ignoradas ao ler o título dos vídeos do YouTube.
+#
+# Como editar:
+#   - Uma palavra ou expressão por linha. Linhas vazias e o que vem depois de "#" são ignorados.
+#   - Maiúsculas/minúsculas e acentos não importam ("karaoke" também pega "KARAOKÊ").
+#   - {n} vale qualquer número, com sinal opcional (ex.: "{n} tons" pega "-2 tons").
+#   - {x} vale uma palavra qualquer (ex.: "key of {x}" pega "key of G").
+#   - Depois de editar, reinicie o programa (npm start).
+#
+# Seções:
+#   [ruido]            palavras que não fazem parte do nome da música
+#   [canais]           nomes de canais de karaokê que aparecem no título
+#   [musica-primeiro]  canais que escrevem "Música - Artista" (o padrão é "Artista - Música")
+
+[ruido]
+# karaokê / versão
+karaokê
+karaoke
+videokê
+versão karaokê
+karaoke version
+versión karaoke
+official karaoke
+karaoke instrumental
+playback
+play back
+instrumental
+sem voz
+no vocals
+without vocals
+backing track
+fundo musical
+base instrumental
+minus one
+off vocal
+
+# letra
+com letra
+letra
+legendado
+with lyrics
+lyrics on screen
+lyrics
+lyric video
+con letra
+sing along
+cante junto
+
+# vídeo / qualidade
+official video
+official audio
+official music video
+vídeo oficial
+áudio oficial
+clipe oficial
+videoclipe
+clip
+hd
+hq
+4k
+1080p
+remastered
+remaster
+remasterizado
+
+# tom
+tom masculino
+tom feminino
+male key
+female key
+lower key
+higher key
+key of {x}
+{n} tom
+{n} tons
+
+[canais]
+sing king
+karafun
+from zoom karaoke
+zoom karaoke
+party tyme karaoke channel
+party tyme karaoke
+party tyme
+songjam
+easykaraoke
+stingray karaoke
+
+[musica-primeiro]
+karafun
