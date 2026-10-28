@@ -2,8 +2,11 @@ import { renderAvatar } from '../shared/avatar.js';
 import { escapeHtml } from '../shared/escape.js';
 import { badgeText } from './copy.js';
 
-// Códigos de erro do IFrame Player: inválido, HTML5, removido/privado, incorporação bloqueada.
-const VIDEO_ERRORS = new Set([2, 5, 100, 101, 150]);
+// Todo erro do IFrame Player impede a música (inválido, removido, incorporação bloqueada, 153...):
+// a TV sempre oferece "Sortear outra música" em vez de deixar a rodada presa (spec §8.5).
+export function isVideoError(code) {
+  return code !== undefined;
+}
 
 let apiPromise = null;
 export function loadYouTubeApi() {
@@ -86,7 +89,7 @@ export function renderPlayer(stage, round, queueCount, { onNext, onReplace, onVi
       player = new YT.Player($('yt'), {
         videoId: song.videoId,
         playerVars: { autoplay: 1, rel: 0, playsinline: 1 },
-        events: { onError: e => { if (VIDEO_ERRORS.has(e.data)) showVideoError(); } },
+        events: { onError: e => { if (isVideoError(e.data)) showVideoError(); } },
       });
     } catch {
       $('play').disabled = false;
