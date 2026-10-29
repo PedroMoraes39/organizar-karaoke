@@ -18,8 +18,12 @@ function setup({ names = ['Ana', 'Bia', 'Léo', 'Rafa'], seed = 7 } = {}) {
     fetchVideoInfo: async () => ({ title: 'Artista - Música (Karaoke)', channel: 'c', thumbnail: 't' }),
   });
   const g = Object.fromEntries(names.map(name => [name, party.join({ name, avatar: AV }).guest]));
-  const add = async (by, title, indicated = []) =>
-    (await party.addSong(by.id, { url: LINK, title, artist: 'X', indicated: indicated.map(x => x.id), note: '' })).song;
+  // Cada música com um vídeo próprio: o mesmo vídeo duas vezes na fila é repetida.
+  let videos = 0;
+  const add = async (by, title, indicated = []) => {
+    const url = `https://youtu.be/video${String(++videos).padStart(6, '0')}`;
+    return (await party.addSong(by.id, { url, title, artist: 'X', indicated: indicated.map(x => x.id), note: '' })).song;
+  };
   return { party, store, g, add };
 }
 
@@ -116,6 +120,16 @@ test('finishRound: música aparece como sorteada para quem mandou', async () => 
   assert.equal(mine.status, 'drawn');
   assert.deepEqual(mine.sungBy, round.singers.map(x => x.name));
   assert.deepEqual(party.finishRound(), { ok: false, error: 'no_round' });
+});
+
+test('música já sorteada pode ser mandada de novo', async () => {
+  const { party, g } = setup();
+  const song = { url: LINK, title: 'Bohemian Rhapsody', artist: 'Queen', indicated: [], note: '' };
+  await party.addSong(g.Ana.id, song);
+  party.draw();
+  party.finishRound();
+  const r = await party.addSong(g.Bia.id, song);
+  assert.equal(r.ok, true);
 });
 
 test('failRound não conta para ninguém', async () => {

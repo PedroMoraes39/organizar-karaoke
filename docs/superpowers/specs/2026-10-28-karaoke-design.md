@@ -110,6 +110,7 @@ Referência: `mockups/personagem.html` e `mockups/celular.html`.
 - **← Voltar** no topo.
 - **Link do YouTube.** Aceitar os formatos comuns (`youtube.com/watch?v=`, `youtu.be/`, `m.youtube.com`, `music.youtube.com`, links com `&list=`, `&t=` etc.) e extrair o ID do vídeo.
 - Depois de colar: miniatura e dois campos **já preenchidos e editáveis**, **Música** e **Artista** (ver §9). Link inválido ou vídeo inexistente/privado mostra mensagem clara.
+- **Música repetida (decisão do usuário):** se o mesmo vídeo, ou a mesma música e artista, já estiver **na fila** (de qualquer pessoa), o celular mostra "Música já adicionada à lista" e não deixa enviar. A comparação ignora maiúsculas, acentos, pontuação e espaços, e "&" vale "e". Confere ao colar o link e de novo ao enviar (os campos são editáveis). Música já sorteada ou apagada pode ser mandada de novo.
 - **Indicar para alguém? (opcional, até 2)**
   - **Lista vertical** (não carrossel) com personagem, nome e um círculo para marcar ✓.
   - A própria pessoa aparece **primeiro**, como "Ana (você)". Os demais vêm em ordem alfabética.
@@ -146,6 +147,8 @@ Referência: `mockups/sorteio-tv.html`. A tela é pensada para 16:9 em tela chei
    - 💌 **Indicada:** um envelope entra, abre e sobe um cartão "De: João / Para: Ana", com o **recadinho** se houver. Depois, corações subindo e "INDICADA!".
    - ⭐ **Escolha própria:** tela escura com "🥁 E quem pediu essa música…", depois holofotes, brilhos e uma coroa caindo no personagem: "PEDIU, CANTOU! O palco é seu!"
 5. **Player** (§8.3).
+
+A revelação final (passo 4) **fica na tela até alguém clicar** em qualquer lugar ou no botão **Pular ⏭**, ou apertar **Espaço** (decisão do usuário). Os passos anteriores seguem sozinhos.
 
 ### 8.3 Player
 
@@ -320,10 +323,9 @@ Seguir os esboços: fundo em degradê roxo/magenta, cartões brancos arredondado
 
 - Framework web, biblioteca de tempo real, estrutura de pastas e esquema do banco.
 - Formato e local do arquivo do dicionário.
-- Durações exatas das animações (manter o ritmo do esboço: ~20 s em solo, ~25 s em dupla).
+- Durações exatas das animações (manter o ritmo do esboço até a revelação final).
 - Implementação do personagem (SVG por peças, como no esboço, é o caminho natural) e acabamento do traço.
 - Mecanismo de proteção dos controles da TV.
-- Comportamento com link de música repetida na fila (avisar ou permitir).
 - Se "Sortear a próxima" volta ao lobby ou já começa o sorteio.
 - Efeitos sonoros (opcionais, não pedidos).
 - Mensagens de erro e textos menores.

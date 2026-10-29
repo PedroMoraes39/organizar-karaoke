@@ -2,12 +2,13 @@ import { renderAvatar } from '../shared/avatar.js';
 import { escapeHtml } from '../shared/escape.js';
 import { revealCopy, envelopeCopy } from './copy.js';
 
-// Ritmo aprovado no esboço (mockups/sorteio-tv.html): ~20 s em solo, ~25 s em dupla, até o player.
+// Ritmo aprovado no esboço (mockups/sorteio-tv.html) até a revelação final,
+// que fica na tela até alguém clicar ou apertar Espaço.
 export const TIMINGS = {
   songTicks: 24, songStart: 45, songGrowth: 1.12, songHold: 1900,
   coin: 2300,
   slotTicks: 20, slotStart: 55, slotGrowth: 1.13, slotGap: 600, slotHold: 700,
-  reveal: 4200, envelope: 3000, drum: 1600, ownReveal: 4400,
+  envelope: 3000, drum: 1600,
   replaceIntro: 500,
 };
 
@@ -22,6 +23,31 @@ function songHtml(title, artist) {
 function slotHtml(person) {
   return `${renderAvatar(person.avatar)}<b>${escapeHtml(person.name)}</b>`;
 }
+
+// Quem aparece na vaga a cada giro: um de cada vez, em ordem; em dupla cada vaga começa num diferente.
+export function reelIndex(poolSize, slot, tick) {
+  return (tick + slot) % poolSize;
+}
+
+// A revelação final só sai da tela com um clique (no botão ou em qualquer lugar) ou Espaço.
+export function waitForSkip(stage, keys = window) {
+  return new Promise(resolve => {
+    const done = () => {
+      stage.removeEventListener('click', done);
+      keys.removeEventListener('keydown', onKey);
+      resolve();
+    };
+    const onKey = e => {
+      if (e.code !== 'Space' && e.key !== ' ') return;
+      e.preventDefault();
+      done();
+    };
+    stage.addEventListener('click', done);
+    keys.addEventListener('keydown', onKey);
+  });
+}
+
+const SKIP = '<button type="button" class="skip">Pular ⏭</button>';
 
 async function songRoulette(stage, round, reel) {
   stage.innerHTML = `
@@ -71,7 +97,7 @@ async function slots(stage, round, guests, spin, kicker) {
     const el = stage.querySelector(`[data-slot="${k}"]`);
     let delay = TIMINGS.slotStart;
     for (let i = 0; i < TIMINGS.slotTicks; i++) {
-      el.innerHTML = slotHtml(pool[(i * 3 + k * 5) % pool.length]);
+      el.innerHTML = slotHtml(pool[reelIndex(pool.length, k, i)]);
       await sleep(delay);
       delay *= TIMINGS.slotGrowth;
     }
@@ -98,8 +124,8 @@ async function revealRandom(stage, round) {
   const confetti = Array.from({ length: 90 }, () =>
     `<i style="left:${Math.random() * 100}%;background:${pick(colors)};animation-duration:${2 + Math.random() * 2}s;animation-delay:${Math.random() * 0.8}s"></i>`).join('');
   const t = textBlock(round);
-  stage.innerHTML = `<div class="scene"><div class="fx confetti">${confetti}</div>${t.title}${revealAvatars(round)}${t.sub}</div>`;
-  await sleep(TIMINGS.reveal);
+  stage.innerHTML = `<div class="scene"><div class="fx confetti">${confetti}</div>${t.title}${revealAvatars(round)}${t.sub}${SKIP}</div>`;
+  await waitForSkip(stage);
 }
 
 async function revealDedic(stage, round) {
@@ -117,8 +143,8 @@ async function revealDedic(stage, round) {
   const hearts = Array.from({ length: 30 }, () =>
     `<span style="left:${Math.random() * 100}%;animation-duration:${2.5 + Math.random() * 2}s;animation-delay:${Math.random() * 1.5}s">${pick(['❤️', '💖', '💕', '💗'])}</span>`).join('');
   const t = textBlock(round);
-  stage.innerHTML = `<div class="scene"><div class="fx hearts">${hearts}</div>${t.title}${revealAvatars(round)}${t.sub}</div>`;
-  await sleep(TIMINGS.reveal);
+  stage.innerHTML = `<div class="scene"><div class="fx hearts">${hearts}</div>${t.title}${revealAvatars(round)}${t.sub}${SKIP}</div>`;
+  await waitForSkip(stage);
 }
 
 async function revealOwn(stage, round) {
@@ -131,9 +157,9 @@ async function revealOwn(stage, round) {
     <div class="scene spotlight">
       <div class="fx"><div class="spot l"></div><div class="spot r"></div></div>
       <div class="fx twinkle">${twinkles}</div>
-      ${t.title}${revealAvatars(round, round.song.suggestedBy.id)}${t.sub}
+      ${t.title}${revealAvatars(round, round.song.suggestedBy.id)}${t.sub}${SKIP}
     </div>`;
-  await sleep(TIMINGS.ownReveal);
+  await waitForSkip(stage);
 }
 
 function reveal(stage, round) {

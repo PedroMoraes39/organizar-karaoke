@@ -12,6 +12,9 @@ const REEL_SONGS = 12;
 
 const toPublic = g => ({ id: g.id, name: g.name, avatar: g.avatar });
 
+// Chave para achar música repetida: sem acento, caixa, pontuação nem espaços; "&" vale "e".
+const songKey = raw => nameKey(String(raw ?? '').replace(/&/g, 'e')).replace(/[^\p{L}\p{N}]/gu, '');
+
 // Regras do domínio (spec §7–§10). O socket só traduz eventos para estas chamadas.
 export function createParty({ store, dict, fetchVideoInfo, weights, rng = Math.random, now = Date.now }) {
   const infoCache = new Map();
@@ -43,6 +46,12 @@ export function createParty({ store, dict, fetchVideoInfo, weights, rng = Math.r
       status: song.status,
       sungBy: song.status === 'drawn' ? store.singersOfSong(song.id) : [],
     };
+  }
+
+  // Repetida = mesmo vídeo, ou mesmo nome e artista, de uma música ainda na fila.
+  function isDuplicate(videoId, title, artist) {
+    const key = songKey(title) + '|' + songKey(artist);
+    return store.listQueuedSongs().some(s => s.videoId === videoId || songKey(s.title) + '|' + songKey(s.artist) === key);
   }
 
   const isPresent = id => {
@@ -140,6 +149,7 @@ export function createParty({ store, dict, fetchVideoInfo, weights, rng = Math.r
       const found = await lookup(url);
       if (!found.ok) return found;
       const { title, artist } = parseTitle(found.info.title, found.info.channel, dict);
+      if (isDuplicate(found.videoId, title, artist)) return { ok: false, error: 'duplicate' };
       return { ok: true, videoId: found.videoId, title, artist, thumbnail: found.info.thumbnail };
     },
 
@@ -157,6 +167,9 @@ export function createParty({ store, dict, fetchVideoInfo, weights, rng = Math.r
 
       const found = await lookup(url);
       if (!found.ok) return found;
+      const cleanArtist = String(artist ?? '').trim().slice(0, TITLE_MAX);
+      // Sem await entre a checagem e o insert: dois envios ao mesmo tempo não passam juntos.
+      if (isDuplicate(found.videoId, cleanTitle, cleanArtist)) return { ok: false, error: 'duplicate' };
       const song = store.addSong({
         videoId: found.videoId,
         url: String(url).trim(),
@@ -164,7 +177,7 @@ export function createParty({ store, dict, fetchVideoInfo, weights, rng = Math.r
         channel: found.info.channel,
         thumbnail: found.info.thumbnail,
         title: cleanTitle,
-        artist: String(artist ?? '').trim().slice(0, TITLE_MAX),
+        artist: cleanArtist,
         suggestedBy: guestId,
         indicated: ids,
         note: cleanNote,

@@ -100,6 +100,55 @@ test('addSong válido aparece em mySongs só de quem mandou', async () => {
   assert.deepEqual(party.mySongs(bia.id), []);
 });
 
+const LINK2 = 'https://youtu.be/AAAAAAAAAAA';
+
+test('addSong: mesma música e artista na fila é repetida, sem ligar para caixa, acento, pontuação e "&"', async () => {
+  const { party } = setup();
+  const ana = party.join({ name: 'Ana', avatar: AV }).guest;
+  const bia = party.join({ name: 'Bia', avatar: AV }).guest;
+  await party.addSong(ana.id, { url: LINK, title: 'Evidências', artist: 'Chitãozinho & Xororó', indicated: [], note: '' });
+  assert.deepEqual(await party.addSong(bia.id, { url: LINK2, title: ' evidencias!! ', artist: 'chitaozinho e xororo', indicated: [], note: '' }),
+    { ok: false, error: 'duplicate' });
+  assert.deepEqual(party.mySongs(bia.id), []);
+});
+
+test('addSong: mesmo vídeo é repetido mesmo com outro nome', async () => {
+  const { party } = setup();
+  const ana = party.join({ name: 'Ana', avatar: AV }).guest;
+  await party.addSong(ana.id, { url: LINK, title: 'Bohemian Rhapsody', artist: 'Queen', indicated: [], note: '' });
+  assert.deepEqual(await party.addSong(ana.id, { url: `https://www.youtube.com/watch?v=dQw4w9WgXcQ`, title: 'Outra', artist: 'Outro', indicated: [], note: '' }),
+    { ok: false, error: 'duplicate' });
+});
+
+test('addSong: mesmo nome de outro artista não é repetida', async () => {
+  const { party } = setup();
+  const ana = party.join({ name: 'Ana', avatar: AV }).guest;
+  await party.addSong(ana.id, { url: LINK, title: 'Evidências', artist: 'Chitãozinho & Xororó', indicated: [], note: '' });
+  const r = await party.addSong(ana.id, { url: LINK2, title: 'Evidências', artist: 'Bruno e Marrone', indicated: [], note: '' });
+  assert.equal(r.ok, true);
+});
+
+test('addSong: música apagada da fila pode ser mandada de novo', async () => {
+  const { party } = setup();
+  const ana = party.join({ name: 'Ana', avatar: AV }).guest;
+  const { song } = await party.addSong(ana.id, { url: LINK, title: 'Bohemian Rhapsody', artist: 'Queen', indicated: [], note: '' });
+  party.deleteSong(ana.id, song.id);
+  const r = await party.addSong(ana.id, { url: LINK, title: 'Bohemian Rhapsody', artist: 'Queen', indicated: [], note: '' });
+  assert.equal(r.ok, true);
+});
+
+test('preview: avisa quando a música já está na fila', async () => {
+  const byName = setup();
+  const ana = byName.party.join({ name: 'Ana', avatar: AV }).guest;
+  await byName.party.addSong(ana.id, { url: LINK2, title: 'bohemian rhapsody', artist: 'QUEEN', indicated: [], note: '' });
+  assert.deepEqual(await byName.party.preview(LINK), { ok: false, error: 'duplicate' });
+
+  const byVideo = setup();
+  const bia = byVideo.party.join({ name: 'Bia', avatar: AV }).guest;
+  await byVideo.party.addSong(bia.id, { url: LINK, title: 'Outra', artist: 'Outro', indicated: [], note: '' });
+  assert.deepEqual(await byVideo.party.preview(LINK), { ok: false, error: 'duplicate' });
+});
+
 test('deleteSong só do dono e só na fila', async () => {
   const { party } = setup();
   const ana = party.join({ name: 'Ana', avatar: AV }).guest;
